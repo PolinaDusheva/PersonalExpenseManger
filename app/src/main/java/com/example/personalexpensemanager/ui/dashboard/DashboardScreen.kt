@@ -16,8 +16,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -28,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.MockDataService
 import com.example.personalexpensemanager.domain.Category
@@ -38,10 +41,10 @@ import com.example.personalexpensemanager.ui.components.SummaryCard
 import com.example.personalexpensemanager.ui.components.TransactionItem
 
 @Composable
-fun DashboardScreen(
+fun SuccessScreen(
     transactions: List<Transaction>,
     categories: List<Category>
-) {
+){
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
@@ -52,8 +55,8 @@ fun DashboardScreen(
             item{
                 Box(
                     modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.header_height))
+                        .fillMaxWidth()
+                        .height(dimensionResource(R.dimen.header_height))
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.waves_bg),
@@ -82,7 +85,7 @@ fun DashboardScreen(
                                 sign = '+',
                                 amount = "120 000",
                                 currency = '€',
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.weight(1f)
                             )
                             SummaryCard(
                                 title = stringResource(R.string.biggest_expense),
@@ -97,9 +100,12 @@ fun DashboardScreen(
             }
             item {
                 Column(
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                 ) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                    Spacer(
+                        modifier = Modifier
+                            .height(dimensionResource(R.dimen.padding_small)))
                     Headline(text = stringResource(R.string.recent_transactions))
                 }
             }
@@ -153,9 +159,11 @@ fun DashboardScreen(
             }
             item {
                 Column(
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                 ) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_section)))
+                    Spacer(modifier = Modifier
+                        .height(dimensionResource(R.dimen.spacer_section)))
                     Headline(text = stringResource(R.string.categories_overview))
                 }
             }
@@ -164,7 +172,9 @@ fun DashboardScreen(
                 items = categories,
                 key = { it.id }
             ) { categoryItem ->
-                Box(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
                     CategoryItem(category = categoryItem)
                 }
             }
@@ -172,15 +182,29 @@ fun DashboardScreen(
         }
     }
 }
-
-@Preview(showBackground = true)
 @Composable
-fun DashboardPreview() {
-    MaterialTheme {
-        val dataService = MockDataService()
-        DashboardScreen(
-            transactions = dataService.getTransaction(),
-            categories = dataService.getCategories()
-        )
+fun DashboardScreen(
+    viewModel: DashboardViewModel
+) {
+    val state  = viewModel.uiState.collectAsStateWithLifecycle()
+    when(val s = state.value){
+        is DashboardUIState.Loading -> CircularProgressIndicator()
+        is DashboardUIState.Success -> SuccessScreen(s.transactions, s.categories)
+        is DashboardUIState.Error   -> Text(s.message)
     }
+
+
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun DashboardPreview() {
+//    MaterialTheme {
+//        val dataService = MockDataService()
+//        DashboardScreen(
+//            viewModel =
+////            transactions = dataService.getTransaction(),
+////            categories = dataService.getCategories()
+//        )
+//    }
+//}

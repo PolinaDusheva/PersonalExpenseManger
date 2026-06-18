@@ -32,7 +32,7 @@ fun TransactionItem(transaction: Transaction){
             Text(
                 text = transaction.title,
                 fontWeight = FontWeight.Bold,
-                fontSize = dimensionResource(R.dimen.font_large).value.sp
+                fontSize = dimensionResource(R.dimen.font_medium).value.sp
             )
             Text(
                 text = transaction.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
@@ -43,7 +43,7 @@ fun TransactionItem(transaction: Transaction){
         Text(
             text = transaction.sign + transaction.amount + transaction.currency,
             fontWeight = FontWeight.Bold,
-            fontSize = dimensionResource(R.dimen.font_large).value.sp
+                fontSize = dimensionResource(R.dimen.font_medium).value.sp
         )
     }
 }
