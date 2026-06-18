@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Personal Expense Manager</string>
+    <string name="total_for_month">Общо за месеца:</string>
+    <string name="biggest_expense">Най-голям разход:</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="categories_overview">Categories overview</string>
+</resources>
