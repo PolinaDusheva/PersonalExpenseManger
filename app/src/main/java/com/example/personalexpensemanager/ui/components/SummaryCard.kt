@@ -18,9 +18,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SummaryCard(
     title: String,
-    amount: String,
+    amount: Double,
     currency: Char,
-    sign: Char,
     modifier: Modifier = Modifier,
 
 ) {
@@ -50,7 +49,7 @@ fun SummaryCard(
                 color = Color.Black
             )
             Text(
-                text = "$sign$amount$currency",
+                text = "$amount$currency",
                 fontSize = 18.sp,
                 color = Color.Black
             )

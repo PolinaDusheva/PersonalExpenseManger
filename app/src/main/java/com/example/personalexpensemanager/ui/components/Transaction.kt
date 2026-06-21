@@ -41,7 +41,7 @@ fun TransactionItem(transaction: Transaction){
             )
         }
         Text(
-            text = transaction.sign + transaction.amount + transaction.currency,
+            text = transaction.sign + transaction.amount.toString() + transaction.currency,
             fontWeight = FontWeight.Bold,
                 fontSize = dimensionResource(R.dimen.font_medium).value.sp
         )
