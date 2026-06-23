@@ -25,11 +25,11 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppNavigation(){
     val myNavigationManager = rememberNavController()
-    val factory = AppViewModelFactory(FakeExpenseDataService())
+    val factory = AppViewModelFactory()
 
     NavHost(
         navController = myNavigationManager,
-        startDestination = Screen.Transactions.route
+        startDestination = Screen.Dashboard.route
     ) {
         composable(Screen.Dashboard.route) {
             val viewModel: DashboardViewModel = viewModel(factory = factory)
@@ -39,16 +39,16 @@ fun AppNavigation(){
             val viewModel: TransactionViewModel = viewModel(factory =  factory)
             TransactionsScreen(viewModel = viewModel)
         }
-        composable(
-            route = Screen.Categories.route,
-            arguments = listOf(navArgument(name ="categoryId")
-            {
-                type = NavType.StringType
-            })
-        ){backStackEntry ->
-            val categoryId = backStackEntry.arguments?.getString("categoryId")
-            CategoriesScreen(categoryId = categoryId)
-        }
+//        composable(
+//            route = Screen.Categories.route,
+//            arguments = listOf(navArgument(name ="categoryId")
+//            {
+//                type = NavType.StringType
+//            })
+//        ){backStackEntry ->
+//            val categoryId = backStackEntry.arguments?.getString("categoryId")
+//            CategoriesScreen(categoryId = categoryId)
+//        }
     }
 
 }

@@ -113,19 +113,19 @@ fun SuccessScreen(
                 items = transactions,
                 key = { it.id }
             ) { transaction ->
-                val isFirst = transaction.id == transactions.first().id
-                val isLast = transaction.id == transactions.last().id
-                val shape = RoundedCornerShape(
-                    topStart = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-                    topEnd = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-                    bottomStart = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-                    bottomEnd = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp
-                )
+//                val isFirst = transaction.id == transactions.first().id
+//                val isLast = transaction.id == transactions.last().id
+//                val shape = RoundedCornerShape(
+//                    topStart = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
+//                    topEnd = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
+//                    bottomStart = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
+//                    bottomEnd = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp
+//                )
                 Column(
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                         .fillMaxWidth()
-                        .background(Color.White, shape)
+                        //.background(Color.White, shape)
                         .padding(horizontal = dimensionResource(R.dimen.padding_standard))
                 ) {
                     TransactionItem(transaction)

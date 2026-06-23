@@ -19,26 +19,23 @@ class DashboardViewModel(
 
     private fun load(){
         viewModelScope.launch {
-            val transactions = dataService.getTransactions()
-            val categories = dataService.getCategories()
-
-            val totalAmount = calculateTotalAmount(transactions)
-
-            val biggestExpense = transactions
-                .filter { it.sign == '-' }
-                .maxOfOrNull { it.amount.toDouble() } ?: 0.0
-            _uiState.value = DashboardUIState.Loading
+            _uiState.value = DashboardUIState.Loading   // първо
             try {
+                val transactions = dataService.getTransactions()  // вътре в try
+                val categories = dataService.getCategories()      // вътре в try
+                val totalAmount = calculateTotalAmount(transactions)
+                val biggestExpense = transactions
+                    .filter { it.sign == '-' }
+                    .maxOfOrNull { it.amount } ?: 0.0
                 _uiState.value = DashboardUIState.Success(
-                    transactions = transactions,
+                    transactions = transactions.take(5),
                     categories = categories,
                     totalAmount = totalAmount,
                     biggestExpense = biggestExpense
                 )
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 _uiState.value = DashboardUIState.Error(e.message ?: "Error")
             }
-
         }
     }
     private fun calculateTotalAmount(transactions: List<Transaction>): Double {
