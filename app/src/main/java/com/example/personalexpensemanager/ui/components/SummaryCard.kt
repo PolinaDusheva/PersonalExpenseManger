@@ -34,7 +34,7 @@ fun SummaryCard(
     ) {
         Column(
             modifier = Modifier.padding(
-                start = 10.dp,
+                start = 15.dp,
                 top = 20.dp,
                 end = 10.dp,
                 bottom = 20.dp,

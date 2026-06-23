@@ -14,6 +14,8 @@ import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
 import androidx.navigation.navArgument
 import com.example.personalexpensemanager.data.AppViewModelFactory
 import com.example.personalexpensemanager.data.FakeExpenseDataService
+import com.example.personalexpensemanager.ui.addExpense.AddExpenseScreen
+import com.example.personalexpensemanager.ui.addExpense.AddExpenseViewModel
 import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
 
@@ -21,6 +23,10 @@ sealed class Screen(val route: String) {
     data object Dashboard : Screen("dashboard")
     data object Transactions : Screen("transactions/{transactionId}")
     data object Categories : Screen("categories/{categoryId}")
+    data object TransactionDetail : Screen("transactionDetail/{transactionId}") {
+        fun createRoute(transactionId: String) = "transactionDetail/$transactionId"
+    }
+    data object AddExpense : Screen("addExpense")
 }
 @Composable
 fun AppNavigation(){
@@ -29,7 +35,7 @@ fun AppNavigation(){
 
     NavHost(
         navController = myNavigationManager,
-        startDestination = Screen.Dashboard.route
+        startDestination = Screen.Transactions.route
     ) {
         composable(Screen.Dashboard.route) {
             val viewModel: DashboardViewModel = viewModel(factory = factory)
@@ -37,7 +43,18 @@ fun AppNavigation(){
         }
         composable(Screen.Transactions.route){
             val viewModel: TransactionViewModel = viewModel(factory =  factory)
-            TransactionsScreen(viewModel = viewModel)
+            TransactionsScreen(
+                viewModel = viewModel,
+                onTransactionClick = { id ->
+                    myNavigationManager.navigate(Screen.TransactionDetail.createRoute(id))
+                }
+            )
+        }
+        composable(Screen.AddExpense.route) {
+            val viewModel: AddExpenseViewModel = viewModel(factory = factory)
+            AddExpenseScreen(viewModel = viewModel, onBack = {
+                myNavigationManager.navigate(Screen.Transactions.route)
+            })
         }
 //        composable(
 //            route = Screen.Categories.route,

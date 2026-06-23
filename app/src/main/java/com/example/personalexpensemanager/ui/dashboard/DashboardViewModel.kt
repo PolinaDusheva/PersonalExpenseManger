@@ -19,14 +19,12 @@ class DashboardViewModel(
 
     private fun load(){
         viewModelScope.launch {
-            _uiState.value = DashboardUIState.Loading   // първо
+            _uiState.value = DashboardUIState.Loading
             try {
-                val transactions = dataService.getTransactions()  // вътре в try
-                val categories = dataService.getCategories()      // вътре в try
+                val transactions = dataService.getTransactions()
+                val categories = dataService.getCategories()
                 val totalAmount = calculateTotalAmount(transactions)
-                val biggestExpense = transactions
-                    .filter { it.sign == '-' }
-                    .maxOfOrNull { it.amount } ?: 0.0
+                val biggestExpense = calculateBiggestExpense(transactions)
                 _uiState.value = DashboardUIState.Success(
                     transactions = transactions.take(5),
                     categories = categories,
@@ -49,7 +47,15 @@ class DashboardViewModel(
         }
         return amount
     }
-    private fun calculateBiggestExpense(){
+    private fun calculateBiggestExpense(transactions: List<Transaction>): Double {
+        var maxExpense: Double = 0.0
+        for(currentTransaction in transactions){
+            var currAmount = currentTransaction.amount
+            if(currentTransaction.sign == '-' && currAmount>maxExpense){
+                maxExpense = currAmount
+            }
+        }
+        return maxExpense
 
     }
 }

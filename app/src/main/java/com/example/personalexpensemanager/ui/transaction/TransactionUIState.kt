@@ -1,5 +1,6 @@
 package com.example.personalexpensemanager.ui.transaction
 
+import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
 
 sealed interface TransactionUIState {
@@ -7,7 +8,9 @@ sealed interface TransactionUIState {
     data class Success(
         val transactions: List<Transaction>,
         val filteredTransactions: List<Transaction>,
-        val selectedCategory: String?
+        val categories: List<Category>,
+        val selectedCategory: String?,
+        val sortingType: SortingType
     ) : TransactionUIState
     data class Error(val message: String) : TransactionUIState
 }

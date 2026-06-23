@@ -36,6 +36,7 @@ import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.CategoryItem
 import com.example.personalexpensemanager.ui.components.SummaryCard
 import com.example.personalexpensemanager.ui.components.TransactionItem
+import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.time.LocalDate
 
 @Composable
@@ -47,7 +48,7 @@ fun SuccessScreen(
 ){
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White
+        //color = Color.White
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
@@ -111,24 +112,32 @@ fun SuccessScreen(
             }
             items(
                 items = transactions,
-                key = { it.id }
+                key = { "transaction_${it.id}" }
             ) { transaction ->
-//                val isFirst = transaction.id == transactions.first().id
-//                val isLast = transaction.id == transactions.last().id
-//                val shape = RoundedCornerShape(
-//                    topStart = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-//                    topEnd = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-//                    bottomStart = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-//                    bottomEnd = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp
-//                )
-                Column(
+                val isFirst = transaction.id == transactions.first().id
+                val isLast = transaction.id == transactions.last().id
+                val shape = RoundedCornerShape(
+                    topStart = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
+                    topEnd = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
+                    bottomStart = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
+                    bottomEnd = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp
+                )
+                Surface(
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
-                        .fillMaxWidth()
-                        //.background(Color.White, shape)
-                        .padding(horizontal = dimensionResource(R.dimen.padding_standard))
+                        .fillMaxWidth(),
+                    shape = shape,
+                    color = Color.White,
+                    shadowElevation = 4.dp
                 ) {
-                    TransactionItem(transaction)
+                    Column(
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.padding_standard),
+
+                        )
+                    ) {
+                        TransactionItem(transaction)
+                    }
                 }
             }
             item {
@@ -144,7 +153,7 @@ fun SuccessScreen(
 
             items(
                 items = categories,
-                key = { it.id }
+                key = { "category_${it.id}" }
             ) { categoryItem ->
                 Box(
                     modifier = Modifier
@@ -180,17 +189,55 @@ fun DashboardContent(state: DashboardUIState) {
 //@Preview(showBackground = true)
 //@Composable
 //fun DashboardPreview() {
-//    MaterialTheme {
+//    PersonalExpenseManagerTheme {
 //        DashboardContent(
 //            state = DashboardUIState.Success(
 //                transactions = listOf(
 //                    Transaction(
 //                        id = "t1",
 //                        title = "Супермаркет",
-//                        amount = "150",
+//                        amount = 150.0,
 //                        date = LocalDate.of(2026, 6, 1),
 //                        currency = '€',
-//                        sign = '-')
+//                        sign = '-',
+//                        categoryId = "c1"
+//                    ),
+//                    Transaction(
+//                        id = "t2",
+//                        title = "Наем",
+//                        amount = 660.0,
+//                        date = LocalDate.of(2026, 6, 1),
+//                        currency = '€',
+//                        sign = '-',
+//                        categoryId = "c2"
+//                    ),
+//                    Transaction(
+//                        id = "t3",
+//                        title = "Заплата",
+//                        amount = 2500.0,
+//                        date = LocalDate.of(2026, 6, 5),
+//                        currency = '€',
+//                        sign = '+',
+//                        categoryId = "c3"
+//                    ),
+//                    Transaction(
+//                        id = "t4",
+//                        title = "Интернет",
+//                        amount = 20.0,
+//                        date = LocalDate.of(2026, 6, 10),
+//                        currency = '€',
+//                        sign = '-',
+//                        categoryId = "c2"
+//                    ),
+//                    Transaction(
+//                        id = "t5",
+//                        title = "Ресторант",
+//                        amount = 40.0,
+//                        date = LocalDate.of(2026, 6, 9),
+//                        currency = '€',
+//                        sign = '-',
+//                        categoryId = "c1"
+//                    )
 //                ),
 //                categories = listOf(
 //                    Category(
@@ -198,10 +245,22 @@ fun DashboardContent(state: DashboardUIState) {
 //                        iconName = "restaurant",
 //                        name = "Храна",
 //                        progress = 0.6f,
-//                        percentage = "60%")
+//                        percentage = "60%"),
+//                    Category(
+//                        id = "c2",
+//                        iconName = "home",
+//                        name = "Дом",
+//                        progress = 0.4f,
+//                        percentage = "40%"),
+//                    Category(
+//                        id = "c3",
+//                        iconName = "payments",
+//                        name = "Сметки",
+//                        progress = 0.1f,
+//                        percentage = "10%")
 //                ),
-//                totalAmount = "2500",
-//                biggestExpense = "660"
+//                totalAmount = 2500.0,
+//                biggestExpense = 660.0
 //            )
 //        )
 //    }

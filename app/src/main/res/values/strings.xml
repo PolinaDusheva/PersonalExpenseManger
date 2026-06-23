@@ -4,4 +4,8 @@
     <string name="biggest_expense">Най-голям разход:</string>
     <string name="recent_transactions">Recent Transactions</string>
     <string name="categories_overview">Categories overview</string>
+    <string name="all_categories">Всички</string>
+    <string name="sort_by_amount">Сума</string>
+    <string name="sort_by_date">Дата</string>
+    <string name="transaction_history">Транзакции</string>
 </resources>

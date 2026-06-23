@@ -1,5 +1,6 @@
 package com.example.personalexpensemanager.domain
 
+import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import java.time.LocalDate
 
 data class Transaction(
@@ -9,5 +10,7 @@ data class Transaction(
     val date: LocalDate,
     val currency: Char,
     val sign: Char,
-    val categoryId : String
+    val categoryId : String,
+    val description: String,
+    val paymentMethod: PaymentMethod
 )
