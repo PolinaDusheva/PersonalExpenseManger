@@ -1,10 +1,11 @@
 package com.example.personalexpensemanager.ui.transactionDetails
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.personalexpensemanager.data.ExpenseDataService
-import com.example.personalexpensemanager.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 
 class TransactionDetailsViewModel(
@@ -16,8 +17,19 @@ class TransactionDetailsViewModel(
 
     init { load() }
 
-    fun load(){
-
+    private fun load() {
+        viewModelScope.launch {
+            try {
+                val transaction = dataService.getTransactions().find { it.id == transactionId }
+                if (transaction != null) {
+                    _uiState.value = TransactionDetailsUIState.Success(transaction)
+                } else {
+                    _uiState.value = TransactionDetailsUIState.Error("Транзакцията не е намерена")
+                }
+            } catch (e: Exception) {
+                _uiState.value = TransactionDetailsUIState.Error(e.message ?: "Грешка")
+            }
+        }
     }
 
 

@@ -14,7 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.personalexpensemanager.domain.Category
+import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,3 +67,20 @@ fun CategoryDropdown(
         }
     }
 }
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryDropdownPreview() {
+//    PersonalExpenseManagerTheme {
+//        CategoryDropdown(
+//            categories = listOf(
+//                Category("1", "restaurant", "Храна", 0.6f, "60%"),
+//                Category("2", "car", "Транспорт", 0.3f, "30%")
+//            ),
+//            selectedCategoryId = null,
+//            onCategorySelected = {},
+//            includeAll = true
+//        )
+//    }
+//}

@@ -5,15 +5,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButtonDefaults.elevation
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.colorResource
+import com.example.personalexpensemanager.R
 
 @Composable
 fun SummaryCard(
@@ -29,30 +30,41 @@ fun SummaryCard(
             containerColor = Color.White,
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = dimensionResource(R.dimen.summary_card_elevation)
         )
     ) {
         Column(
             modifier = Modifier.padding(
-                start = 15.dp,
-                top = 20.dp,
-                end = 10.dp,
-                bottom = 20.dp,
+                start = dimensionResource(R.dimen.summary_card_padding_start),
+                top = dimensionResource(R.dimen.summary_card_padding_top),
+                end = dimensionResource(R.dimen.summary_card_padding_end),
+                bottom = dimensionResource(R.dimen.summary_card_padding_bottom),
             ),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.summary_card_content_spacing)),
         ) {
             Text(
                 text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-                color = Color.Black
+                style = MaterialTheme.typography.labelLarge,
+                color = colorResource(R.color.black)
             )
             Text(
                 text = "$amount$currency",
-                fontSize = 18.sp,
-                color = Color.Black
+                style = MaterialTheme.typography.titleLarge,
+                color = colorResource(R.color.black)
             )
         }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun SummaryCardPreview() {
+    PersonalExpenseManagerTheme {
+        SummaryCard(
+            title = "Общо за месеца",
+            amount = 1250.50,
+            currency = '€'
+        )
     }
 }

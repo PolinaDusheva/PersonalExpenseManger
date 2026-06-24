@@ -1,17 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Общи (layout-неутрални) -->
     <dimen name="padding_horizontal">20dp</dimen>
     <dimen name="padding_standard">16dp</dimen>
     <dimen name="padding_small">8dp</dimen>
-    <dimen name="header_height">210dp</dimen>
-    <dimen name="font_large">18sp</dimen>
-    <dimen name="font_medium">16sp</dimen>
-    <dimen name="font_small">12sp</dimen>
-    <dimen name="spacer_top">50dp</dimen>
-    <dimen name="cards_spacing">16dp</dimen>
-    <dimen name="card_elevation">8dp</dimen>
-    <dimen name="card_corner_radius">12dp</dimen>
-    <dimen name="spacer_section">30dp</dimen>
-    <dimen name="category_icon_spacing">8dp</dimen>
-    <dimen name="card_vertical_spacing">4dp</dimen>
+
+    <!-- Dashboard -->
+    <dimen name="dashboard_header_height">210dp</dimen>
+    <dimen name="dashboard_spacer_top">50dp</dimen>
+    <dimen name="dashboard_section_spacer">30dp</dimen>
+    <dimen name="dashboard_cards_spacing">16dp</dimen>
+
+    <!-- SummaryCard -->
+    <dimen name="summary_card_padding_start">15dp</dimen>
+    <dimen name="summary_card_padding_top">20dp</dimen>
+    <dimen name="summary_card_padding_end">10dp</dimen>
+    <dimen name="summary_card_padding_bottom">20dp</dimen>
+    <dimen name="summary_card_content_spacing">8dp</dimen>
+    <dimen name="summary_card_elevation">4dp</dimen>
+
+    <!-- Transaction row (TransactionItem) -->
+    <dimen name="transaction_row_vertical_padding">10dp</dimen>
+    <dimen name="transaction_icon_circle_size">44dp</dimen>
+    <dimen name="transaction_icon_text_spacing">12dp</dimen>
+    <dimen name="transaction_card_corner_radius">12dp</dimen>
+    <dimen name="transaction_card_elevation">4dp</dimen>
+
+    <!-- CategoryItem (Dashboard progress row) -->
+    <dimen name="category_row_icon_spacing">8dp</dimen>
+    <dimen name="category_progress_height">10dp</dimen>
+
+    <!-- CategoryCard (grid) -->
+    <dimen name="category_card_corner_radius">16dp</dimen>
+    <dimen name="category_card_padding">12dp</dimen>
+    <dimen name="category_card_icon_size">32dp</dimen>
+    <dimen name="category_card_delete_icon_size">22dp</dimen>
+
+    <!-- Headline -->
+    <dimen name="headline_spacer">8dp</dimen>
+
+    <!-- AddExpense form -->
+    <dimen name="add_expense_padding">16dp</dimen>
+    <dimen name="add_expense_field_spacing">16dp</dimen>
+
+    <!-- CategoryFormDialog -->
+    <dimen name="category_dialog_field_spacing">12dp</dimen>
 </resources>

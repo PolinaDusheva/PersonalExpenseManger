@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.personalexpensemanager.ui.addExpense.AddExpenseViewModel
 import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
+import com.example.personalexpensemanager.ui.category.CategoriesViewModel
 
 class AppViewModelFactory(
 ) : ViewModelProvider.Factory {
@@ -22,6 +23,8 @@ class AppViewModelFactory(
 
             modelClass.isAssignableFrom(AddExpenseViewModel::class.java) ->
                 AddExpenseViewModel(dataService = dataService) as T
+            modelClass.isAssignableFrom(CategoriesViewModel::class.java) ->
+                CategoriesViewModel(dataService = dataService) as T
 
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }

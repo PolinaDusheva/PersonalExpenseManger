@@ -1,72 +1,94 @@
 package com.example.personalexpensemanager.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
-import com.example.personalexpensemanager.ui.dashboard.DashboardScreen
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
-import com.example.personalexpensemanager.ui.category.CategoriesScreen
-import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.personalexpensemanager.data.AppViewModelFactory
-import com.example.personalexpensemanager.data.FakeExpenseDataService
 import com.example.personalexpensemanager.ui.addExpense.AddExpenseScreen
 import com.example.personalexpensemanager.ui.addExpense.AddExpenseViewModel
+import com.example.personalexpensemanager.ui.category.CategoriesScreen
+import com.example.personalexpensemanager.ui.category.CategoriesViewModel
+import com.example.personalexpensemanager.ui.dashboard.DashboardScreen
 import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
+import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
+import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsScreen
+import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsViewModel
 
-sealed class Screen(val route: String) {
-    data object Dashboard : Screen("dashboard")
-    data object Transactions : Screen("transactions/{transactionId}")
-    data object Categories : Screen("categories/{categoryId}")
-    data object TransactionDetail : Screen("transactionDetail/{transactionId}") {
-        fun createRoute(transactionId: String) = "transactionDetail/$transactionId"
-    }
-    data object AddExpense : Screen("addExpense")
-}
 @Composable
-fun AppNavigation(){
+fun AppNavigation() {
     val myNavigationManager = rememberNavController()
-    val factory = AppViewModelFactory()
+    val factory = remember { AppViewModelFactory() }
 
-    NavHost(
-        navController = myNavigationManager,
-        startDestination = Screen.Transactions.route
-    ) {
-        composable(Screen.Dashboard.route) {
-            val viewModel: DashboardViewModel = viewModel(factory = factory)
-            DashboardScreen(viewModel = viewModel)
+    val backStackEntry by myNavigationManager.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+
+    Scaffold(
+        bottomBar = {
+            if (currentRoute in bottomTabs.map { it.screen.route }) {
+                BottomNavBar(
+                    currentRoute = currentRoute,
+                    onTabClick = { screen ->
+                        myNavigationManager.navigate(screen.route) {
+                            popUpTo(Screen.Dashboard.route) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
         }
-        composable(Screen.Transactions.route){
-            val viewModel: TransactionViewModel = viewModel(factory =  factory)
-            TransactionsScreen(
-                viewModel = viewModel,
-                onTransactionClick = { id ->
-                    myNavigationManager.navigate(Screen.TransactionDetail.createRoute(id))
-                }
-            )
+    ) { innerPadding ->
+        NavHost(
+            navController = myNavigationManager,
+            startDestination = Screen.Dashboard.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Dashboard.route) {
+                val viewModel: DashboardViewModel = viewModel(factory = factory)
+                DashboardScreen(viewModel = viewModel)
+            }
+            composable(Screen.Transactions.route) {
+                val viewModel: TransactionViewModel = viewModel(factory = factory)
+                TransactionsScreen(
+                    viewModel = viewModel,
+                    onBack = { myNavigationManager.popBackStack() },
+                    onTransactionClick = { id ->
+                        myNavigationManager.navigate(Screen.TransactionDetail.createRoute(id))
+                    }
+                )
+            }
+            composable(
+                Screen.TransactionDetail.route,
+                arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
+            ) { entry ->
+                val id = entry.arguments?.getString("transactionId") ?: return@composable
+                TransactionDetailsScreen(
+                    transactionId = id
+                )
+            }
+            composable(Screen.AddExpense.route) {
+                val viewModel: AddExpenseViewModel = viewModel(factory = factory)
+                AddExpenseScreen(
+                    viewModel = viewModel,
+                    onBack = { myNavigationManager.popBackStack() }
+                )
+            }
+            composable(Screen.Categories.route) {
+                val viewModel: CategoriesViewModel = viewModel(factory = factory)
+                CategoriesScreen(viewModel = viewModel)
+            }
         }
-        composable(Screen.AddExpense.route) {
-            val viewModel: AddExpenseViewModel = viewModel(factory = factory)
-            AddExpenseScreen(viewModel = viewModel, onBack = {
-                myNavigationManager.navigate(Screen.Transactions.route)
-            })
-        }
-//        composable(
-//            route = Screen.Categories.route,
-//            arguments = listOf(navArgument(name ="categoryId")
-//            {
-//                type = NavType.StringType
-//            })
-//        ){backStackEntry ->
-//            val categoryId = backStackEntry.arguments?.getString("categoryId")
-//            CategoriesScreen(categoryId = categoryId)
-//        }
     }
-
 }
-

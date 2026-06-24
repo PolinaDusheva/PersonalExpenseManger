@@ -27,9 +27,9 @@ class FakeExpenseDataService: ExpenseDataService {
     )
 
     private val categories = mutableListOf<Category>(
-        Category(id = "1", iconName = "restaurant", name = "Храна", progress = 0.6f, percentage = "60%"),
-        Category(id = "2", iconName = "car", name = "Транспорт", progress = 0.3f, percentage = "30%"),
-        Category(id = "3", iconName = "payments", name = "Сметки", progress = 0.1f, percentage = "10%"),
+        Category(id = "1", iconName = "restaurant", name = "Храна"),
+        Category(id = "2", iconName = "car", name = "Транспорт"),
+        Category(id = "3", iconName = "payments", name = "Сметки"),
     )
 
     override suspend fun getTransactions(): List<Transaction> {
@@ -47,5 +47,17 @@ class FakeExpenseDataService: ExpenseDataService {
         transactions.add(transaction)
     }
 
+    override suspend fun addCategory(category: Category) {
+        categories.add(category)
+    }
+
+    override suspend fun updateCategory(category: Category){
+        val index = categories.indexOfFirst { it.id == category.id }
+        if (index != -1) categories[index] = category
+    }
+
+    override suspend fun deleteCategory(categoryId: String) {
+        categories.removeAll { it.id == categoryId }
+    }
 
 }

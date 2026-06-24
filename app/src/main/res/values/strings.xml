@@ -1,11 +1,38 @@
 <resources>
     <string name="app_name">Personal Expense Manager</string>
-    <string name="total_for_month">Общо за месеца:</string>
-    <string name="biggest_expense">Най-голям разход:</string>
+
+    <!-- Dashboard -->
+    <string name="total_for_month">Total for month:</string>
+    <string name="biggest_expense">Biggest expense:</string>
     <string name="recent_transactions">Recent Transactions</string>
     <string name="categories_overview">Categories overview</string>
-    <string name="all_categories">Всички</string>
-    <string name="sort_by_amount">Сума</string>
-    <string name="sort_by_date">Дата</string>
-    <string name="transaction_history">Транзакции</string>
+
+    <!-- Transactions screen -->
+    <string name="transaction_history">Transactions</string>
+    <string name="all_categories">All</string>
+    <string name="sort_by_amount">Amount</string>
+    <string name="sort_by_date">Date</string>
+
+    <!-- AddExpense screen -->
+    <string name="add_expense_title">New transaction</string>
+    <string name="add_expense_amount_label">Amount</string>
+    <string name="add_expense_date_label">Date</string>
+    <string name="add_expense_description_label">Description</string>
+    <string name="add_expense_save">Save</string>
+    <string name="add_expense_saving">Saving…</string>
+    <string name="payment_method">Payment method</string>
+
+    <!-- Category dialog / card -->
+    <string name="category_name_label">Name</string>
+    <string name="category_icon_label">Icon</string>
+    <string name="category_icon_select">Choose</string>
+    <string name="category_save">Save</string>
+    <string name="category_cancel">Cancel</string>
+    <string name="category_delete">Delete</string>
+
+    <!-- CategoryDropdown -->
+    <string name="category_dropdown_placeholder">Choose category</string>
+
+    <!-- Date format -->
+    <string name="date_format_pattern">dd.MM.yyyy</string>
 </resources>

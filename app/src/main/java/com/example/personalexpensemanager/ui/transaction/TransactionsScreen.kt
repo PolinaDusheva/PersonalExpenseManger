@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -70,34 +71,25 @@ fun SuccessScreen(
                         categories = state.categories,
                         selectedCategoryId = state.selectedCategory,
                         onCategorySelected = onCategorySelected,
-                        includeAll = true
+                        includeAll = true,
+
                     )
                     FilterChip(
                         selected = state.sortingType == SortingType.AMOUNT,
                         onClick = { onSortSelected(SortingType.AMOUNT) },
-                        label = { Text(stringResource(R.string.sort_by_amount)) }
+                        label = { Text(stringResource(R.string.sort_by_amount),
+
+                        ) }
                     )
                     FilterChip(
                         selected = state.sortingType == SortingType.DATE,
                         onClick = { onSortSelected(SortingType.DATE) },
-                        label = { Text(stringResource(R.string.sort_by_date)) }
+                        label = { Text(stringResource(R.string.sort_by_date),
+
+                        ) }
                     )
                 }
             }
-
-//            state.groupedByDate.forEach { (date, transactionsForDate) ->
-//                item(key = "header_$date") {
-//                    Text(
-//                        text = date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 14.sp,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        modifier = Modifier.padding(
-//                            horizontal = dimensionResource(R.dimen.padding_horizontal),
-//                            vertical = dimensionResource(R.dimen.padding_small)
-//                        )
-//                    )
-//                }
                 items(
                     items = state.filteredTransactions,
                     key = { it.id }
@@ -111,7 +103,6 @@ fun SuccessScreen(
                         TransactionItem(transaction)
                     }
                 }
-//            }
         }
     }
 }
@@ -151,11 +142,9 @@ fun TransactionsContent(
                     fontWeight = FontWeight.Bold
                 )
             },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                }
-            }
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.White
+            )
         )
         when (val s = state) {
             is TransactionUIState.Loading -> CircularProgressIndicator()
@@ -186,8 +175,8 @@ fun TransactionScreenPreview() {
                 transactions = list,
                 filteredTransactions = list,
                 categories = listOf(
-                    Category("1", "restaurant", "Храна", 0.6f, "60%"),
-                    Category("2", "car", "Транспорт", 0.3f, "30%")
+                    Category("1", "restaurant", "Храна"),
+                    Category("2", "car", "Транспорт")
                 ),
                 selectedCategory = null,
                 sortingType = SortingType.NONE

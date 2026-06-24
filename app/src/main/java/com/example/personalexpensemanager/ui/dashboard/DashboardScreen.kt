@@ -18,6 +18,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.FakeExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
+import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.CategoryItem
 import com.example.personalexpensemanager.ui.components.SummaryCard
@@ -42,145 +44,160 @@ import java.time.LocalDate
 @Composable
 fun SuccessScreen(
     transactions: List<Transaction>,
-    categories: List<Category>,
+    categoriesMap: HashMap<Category, Float>,
     totalAmount: Double,
-    biggestExpense: Double
+    biggestExpense: Double,
+    onRefresh: () -> Unit
 ){
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        //color = Color.White
-    ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
+    PullToRefreshBox(
+        isRefreshing = false,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize()
+    ){
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.White
         ) {
-            item{
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.header_height))
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.waves_bg),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        alpha = 1f
-                    )
-                    Column(
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                item{
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(
-                                horizontal = dimensionResource(R.dimen.padding_horizontal),
-                                vertical = dimensionResource(R.dimen.padding_horizontal)
-                            )
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.dashboard_header_height))
                     ) {
-                        Spacer(
-                            modifier = Modifier.height(dimensionResource(R.dimen.spacer_top)))
-                        //Headline(text = "Total")
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.cards_spacing))
+                        Image(
+                            painter = painterResource(id = R.drawable.waves_bg),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            alpha = 1f
+                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    horizontal = dimensionResource(R.dimen.padding_horizontal),
+                                    vertical = dimensionResource(R.dimen.padding_horizontal)
+                                )
                         ) {
-                            SummaryCard(
-                                title = stringResource(R.string.total_for_month),
-//                                sign = '+',
-                                amount = totalAmount,
-                                currency = '€',
-                                modifier = Modifier.weight(1f)
-                            )
-                            SummaryCard(
-                                title = stringResource(R.string.biggest_expense),
-//                                sign = '+',
-                                amount = biggestExpense,
-                                currency = '€',
-                                modifier = Modifier.weight(1f)
-                            )
+                            Spacer(
+                                modifier = Modifier.height(dimensionResource(R.dimen.dashboard_spacer_top)))
+                            //Headline(text = "Total")
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dashboard_cards_spacing))
+                            ) {
+                                SummaryCard(
+                                    title = stringResource(R.string.total_for_month),
+                                    amount = totalAmount,
+                                    currency = '€',
+                                    modifier = Modifier.weight(1f)
+                                )
+                                SummaryCard(
+                                    title = stringResource(R.string.biggest_expense),
+                                    amount = biggestExpense,
+                                    currency = '€',
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
                     }
                 }
-            }
-            item {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
-                ) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(dimensionResource(R.dimen.padding_small)))
-                    Headline(text = stringResource(R.string.recent_transactions))
-                }
-            }
-            items(
-                items = transactions,
-                key = { "transaction_${it.id}" }
-            ) { transaction ->
-                val isFirst = transaction.id == transactions.first().id
-                val isLast = transaction.id == transactions.last().id
-                val shape = RoundedCornerShape(
-                    topStart = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-                    topEnd = if (isFirst) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-                    bottomStart = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp,
-                    bottomEnd = if (isLast) dimensionResource(R.dimen.card_corner_radius) else 0.dp
-                )
-                Surface(
-                    modifier = Modifier
-                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
-                        .fillMaxWidth(),
-                    shape = shape,
-                    color = Color.White,
-                    shadowElevation = 4.dp
-                ) {
+                item {
                     Column(
-                        modifier = Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.padding_standard),
-
-                        )
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                     ) {
-                        TransactionItem(transaction)
+                        Spacer(
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.padding_small)))
+                        Headline(text = stringResource(R.string.recent_transactions))
                     }
                 }
-            }
-            item {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
-                ) {
-                    Spacer(modifier = Modifier
-                        .height(dimensionResource(R.dimen.spacer_section)))
-                    Headline(text = stringResource(R.string.categories_overview))
-                }
-            }
+                items(
+                    items = transactions,
+                    key = { "transaction_${it.id}" }
+                ) { transaction ->
+                    val isFirst = transaction.id == transactions.first().id
+                    val isLast = transaction.id == transactions.last().id
+                    val shape = RoundedCornerShape(
+                        topStart = if (isFirst) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp,
+                        topEnd = if (isFirst) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp,
+                        bottomStart = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp,
+                        bottomEnd = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp
+                    )
+                    Surface(
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                            .fillMaxWidth(),
+                        shape = shape,
+                        color = Color.White,
+                        shadowElevation = 4.dp
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(
+                                horizontal = dimensionResource(R.dimen.padding_standard),
 
-            items(
-                items = categories,
-                key = { "category_${it.id}" }
-            ) { categoryItem ->
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
-                    CategoryItem(category = categoryItem)
+                                )
+                        ) {
+                            TransactionItem(transaction)
+                        }
+                    }
                 }
-            }
+                item {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                    ) {
+                        Spacer(modifier = Modifier
+                            .height(dimensionResource(R.dimen.dashboard_section_spacer)))
+                        Headline(text = stringResource(R.string.categories_overview))
+                    }
+                }
+                val categoriesEntries = categoriesMap.entries.toList()
+                items(
+                    items = categoriesEntries,
+                    key = { "category_${it.key.id}" }
+                ) { categoryEntry ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
+                        CategoryItem(
+                            category =categoryEntry.key,
+                            categorySize =categoryEntry.value
+                        )
+                    }
+                }
 
+            }
         }
     }
 }
 
+
 @Composable
 fun DashboardScreen(viewModel: DashboardViewModel) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
-    DashboardContent(state.value)
+    DashboardContent(
+        state.value,
+        onRefresh = viewModel::refresh
+        )
 }
 
 @Composable
-fun DashboardContent(state: DashboardUIState) {
+fun DashboardContent(
+    state: DashboardUIState,
+    onRefresh: () -> Unit = {}) {
     when (val s = state) {
         is DashboardUIState.Loading -> CircularProgressIndicator()
         is DashboardUIState.Success -> SuccessScreen(
             transactions = s.transactions,
-            categories = s.categories,
+            categoriesMap = s.categoriesMap,
             totalAmount = s.totalAmount,
-            biggestExpense = s.biggestExpense
+            biggestExpense = s.biggestExpense,
+            onRefresh = onRefresh
         )
         is DashboardUIState.Error   -> Text(s.message)
     }
@@ -193,71 +210,12 @@ fun DashboardContent(state: DashboardUIState) {
 //        DashboardContent(
 //            state = DashboardUIState.Success(
 //                transactions = listOf(
-//                    Transaction(
-//                        id = "t1",
-//                        title = "Супермаркет",
-//                        amount = 150.0,
-//                        date = LocalDate.of(2026, 6, 1),
-//                        currency = '€',
-//                        sign = '-',
-//                        categoryId = "c1"
-//                    ),
-//                    Transaction(
-//                        id = "t2",
-//                        title = "Наем",
-//                        amount = 660.0,
-//                        date = LocalDate.of(2026, 6, 1),
-//                        currency = '€',
-//                        sign = '-',
-//                        categoryId = "c2"
-//                    ),
-//                    Transaction(
-//                        id = "t3",
-//                        title = "Заплата",
-//                        amount = 2500.0,
-//                        date = LocalDate.of(2026, 6, 5),
-//                        currency = '€',
-//                        sign = '+',
-//                        categoryId = "c3"
-//                    ),
-//                    Transaction(
-//                        id = "t4",
-//                        title = "Интернет",
-//                        amount = 20.0,
-//                        date = LocalDate.of(2026, 6, 10),
-//                        currency = '€',
-//                        sign = '-',
-//                        categoryId = "c2"
-//                    ),
-//                    Transaction(
-//                        id = "t5",
-//                        title = "Ресторант",
-//                        amount = 40.0,
-//                        date = LocalDate.of(2026, 6, 9),
-//                        currency = '€',
-//                        sign = '-',
-//                        categoryId = "c1"
-//                    )
+//                    Transaction("1", "Супермаркет", 150.0, LocalDate.of(2026, 6, 1), '€', '-', "c1", "Пазаруване", PaymentMethod.CARD),
+//                    Transaction("2", "Заплата", 2500.0, LocalDate.of(2026, 6, 5), '€', '+', "c1", "Месечна заплата", PaymentMethod.CARD),
 //                ),
 //                categories = listOf(
-//                    Category(
-//                        id = "c1",
-//                        iconName = "restaurant",
-//                        name = "Храна",
-//                        progress = 0.6f,
-//                        percentage = "60%"),
-//                    Category(
-//                        id = "c2",
-//                        iconName = "home",
-//                        name = "Дом",
-//                        progress = 0.4f,
-//                        percentage = "40%"),
-//                    Category(
-//                        id = "c3",
-//                        iconName = "payments",
-//                        name = "Сметки",
-//                        progress = 0.1f,
-//                        percentage = "10%")
+//                    Category("c1", "restaurant", "Храна", 0.6f, "60%"),
+//                    Category("c2", "car", "Транспорт", 0.3f, "30%")
 //                ),
 //                totalAmount = 2500.0,
 //                biggestExpense = 660.0

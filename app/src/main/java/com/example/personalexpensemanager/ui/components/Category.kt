@@ -22,10 +22,15 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.personalexpensemanager.R
+import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(
+    category: Category,
+    categorySize: Float
+) {
     val icon = when (category.iconName) {
         "restaurant" -> Icons.Outlined.Restaurant
         "car" -> Icons.Outlined.DirectionsCar
@@ -37,23 +42,33 @@ fun CategoryItem(category: Category) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = dimensionResource(R.dimen.padding_small)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_icon_spacing)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_row_icon_spacing)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(imageVector = icon, contentDescription = category.name)
             Text(text = category.name)
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = category.percentage)
+            Text(text = "${(categorySize*100).toInt()}%")
         }
         LinearProgressIndicator(
-            progress = {category.progress},
+            progress = categorySize,
             strokeCap = StrokeCap.Round,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(10.dp)
+                .height(dimensionResource(R.dimen.category_progress_height))
                 .padding(bottom = dimensionResource(R.dimen.padding_small))
         )
 
     }
 
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun CategoryItemPreview() {
+//    PersonalExpenseManagerTheme {
+//        CategoryItem(
+//            category = Category(id = "1", iconName = "restaurant", name = "Храна")
+//        )
+//    }
+//}

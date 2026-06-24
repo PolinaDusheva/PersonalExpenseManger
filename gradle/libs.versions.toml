@@ -12,6 +12,8 @@ navigationCompose = "2.9.8"
 material3 = "1.4.0"
 playServicesDrive = "17.0.0"
 benchmarkTraceprocessor = "1.4.1"
+foundation = "1.11.3"
+litertSupportApi = "1.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +35,8 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 play-services-drive = { group = "com.google.android.gms", name = "play-services-drive", version.ref = "playServicesDrive" }
 androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benchmark-traceprocessor", version.ref = "benchmarkTraceprocessor" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+litert-support-api = { group = "com.google.ai.edge.litert", name = "litert-support-api", version.ref = "litertSupportApi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
