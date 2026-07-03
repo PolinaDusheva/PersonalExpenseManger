@@ -10,14 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.DirectionsCar
-import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.StrokeCap
@@ -31,12 +25,7 @@ fun CategoryItem(
     category: Category,
     categorySize: Float
 ) {
-    val icon = when (category.iconName) {
-        "restaurant" -> Icons.Outlined.Restaurant
-        "car" -> Icons.Outlined.DirectionsCar
-        "payments" -> Icons.Outlined.Payments
-        else -> Icons.Outlined.Category
-    }
+    val icon = categoryIconOutlined(category.iconName)
     Column{
         Row(
             modifier = Modifier
@@ -62,13 +51,13 @@ fun CategoryItem(
     }
 
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun CategoryItemPreview() {
-//    PersonalExpenseManagerTheme {
-//        CategoryItem(
-//            category = Category(id = "1", iconName = "restaurant", name = "Храна")
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun CategoryItemPreview() {
+    PersonalExpenseManagerTheme {
+        CategoryItem(
+            category = Category(id = "1", iconName = "food", name = "Храна"),
+            categorySize = 0.6f
+        )
+    }
+}

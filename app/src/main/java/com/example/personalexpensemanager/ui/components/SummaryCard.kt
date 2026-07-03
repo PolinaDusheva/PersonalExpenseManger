@@ -15,12 +15,13 @@ import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.colorResource
 import com.example.personalexpensemanager.R
+import com.example.personalexpensemanager.domain.enums.Currency
 
 @Composable
 fun SummaryCard(
     title: String,
     amount: Double,
-    currency: Char,
+    currency: Currency,
     modifier: Modifier = Modifier,
 
 ) {
@@ -64,7 +65,7 @@ fun SummaryCardPreview() {
         SummaryCard(
             title = "Общо за месеца",
             amount = 1250.50,
-            currency = '€'
+            currency = Currency.EUR
         )
     }
 }

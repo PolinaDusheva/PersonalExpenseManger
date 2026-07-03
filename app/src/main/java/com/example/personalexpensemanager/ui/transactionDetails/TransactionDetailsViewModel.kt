@@ -20,7 +20,7 @@ class TransactionDetailsViewModel(
     private fun load() {
         viewModelScope.launch {
             try {
-                val transaction = dataService.getTransactions().find { it.id == transactionId }
+                val transaction = dataService.getTransaction(transactionId)
                 if (transaction != null) {
                     _uiState.value = TransactionDetailsUIState.Success(transaction)
                 } else {

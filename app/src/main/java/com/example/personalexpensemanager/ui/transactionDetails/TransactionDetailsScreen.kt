@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.example.personalexpensemanager.R
 
 @Composable
 fun TransactionDetailsScreen(transactionId: String){
@@ -17,6 +19,6 @@ fun TransactionDetailsScreen(transactionId: String){
             .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
-        Text("Транзакция: $transactionId")
+        Text(stringResource(R.string.transaction_detail_placeholder, transactionId))
     }
 }

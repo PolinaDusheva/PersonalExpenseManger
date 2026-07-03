@@ -33,6 +33,7 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.FakeExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
+import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.CategoryItem
@@ -92,13 +93,13 @@ fun SuccessScreen(
                                 SummaryCard(
                                     title = stringResource(R.string.total_for_month),
                                     amount = totalAmount,
-                                    currency = '€',
+                                    currency = Currency.EUR,
                                     modifier = Modifier.weight(1f)
                                 )
                                 SummaryCard(
                                     title = stringResource(R.string.biggest_expense),
                                     amount = biggestExpense,
-                                    currency = '€',
+                                    currency = Currency.EUR,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
@@ -202,6 +203,7 @@ fun DashboardContent(
         is DashboardUIState.Error   -> Text(s.message)
     }
 }
+
 
 //@Preview(showBackground = true)
 //@Composable

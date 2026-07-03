@@ -24,7 +24,6 @@ import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
 import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsScreen
-import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsViewModel
 
 @Composable
 fun AppNavigation() {
@@ -36,7 +35,7 @@ fun AppNavigation() {
 
     Scaffold(
         bottomBar = {
-            if (currentRoute in bottomTabs.map { it.screen.route }) {
+            if (currentRoute in bottomTabs().map { it.screen.route }) {
                 BottomNavBar(
                     currentRoute = currentRoute,
                     onTabClick = { screen ->

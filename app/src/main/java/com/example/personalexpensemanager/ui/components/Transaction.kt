@@ -1,5 +1,6 @@
 package com.example.personalexpensemanager.ui.components
 
+import android.icu.number.Precision.currency
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,12 +31,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.time.LocalDate
+import com.example.personalexpensemanager.domain.enums.TransactionType
+import com.example.personalexpensemanager.domain.enums.Currency
+import com.example.personalexpensemanager.domain.enums.signSymbol
+import com.example.personalexpensemanager.domain.enums.symbol
+
 
 @Composable
 fun TransactionItem(transaction: Transaction) {
-    val isIncome = transaction.sign == '+'
-
-
+    val isIncome = transaction.type == TransactionType.INCOME
     val amountColor = if (isIncome) colorResource(R.color.transaction_income) else colorResource(R.color.transaction_expense)
     val circleColor = if (isIncome) colorResource(R.color.transaction_income_circle) else colorResource(R.color.transaction_expense_circle)
     val arrowColor = if (isIncome) colorResource(R.color.transaction_income_arrow) else colorResource(R.color.transaction_expense)
@@ -76,7 +80,7 @@ fun TransactionItem(transaction: Transaction) {
             }
         }
         Text(
-            text = "${transaction.sign}${transaction.amount}${transaction.currency}",
+            text = "${transaction.type.signSymbol}${transaction.amount}${transaction.currency.symbol}",
             style = MaterialTheme.typography.titleMedium,
             color = amountColor
         )
@@ -89,9 +93,15 @@ fun TransactionItemExpensePreview() {
     PersonalExpenseManagerTheme {
         TransactionItem(
             transaction = Transaction(
-                id = "1", title = "Супермаркет", amount = 150.0,
-                date = LocalDate.of(2026, 6, 24), currency = '€', sign = '-',
-                categoryId = "1", description = "Пазаруване", paymentMethod = PaymentMethod.CARD
+                id = "1",
+                title = "Супермаркет",
+                amount = 150.0,
+                date = LocalDate.of(2026, 6, 24),
+                currency = Currency.EUR,
+                type = TransactionType.EXPENSE,
+                categoryId = "1",
+                description = "Пазаруване",
+                paymentMethod = PaymentMethod.CARD
             )
         )
     }
@@ -104,7 +114,7 @@ fun TransactionItemIncomePreview() {
         TransactionItem(
             transaction = Transaction(
                 id = "2", title = "Заплата", amount = 2500.0,
-                date = LocalDate.of(2026, 6, 24), currency = '€', sign = '+',
+                date = LocalDate.of(2026, 6, 24), currency = Currency.EUR, type = TransactionType.EXPENSE,
                 categoryId = "1", description = "Месечна заплата", paymentMethod = PaymentMethod.CARD
             )
         )

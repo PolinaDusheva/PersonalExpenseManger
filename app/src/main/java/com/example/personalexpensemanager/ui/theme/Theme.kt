@@ -9,10 +9,13 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
+
     tertiary = Pink80,
 )
 
@@ -31,6 +34,16 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+val GradientStart = Color(0xFF3F5EFB)
+val GradientEnd = Color(0xFFD859FF)
+object GradientGraphics {
+    val primaryHorizontal = Brush.horizontalGradient(
+        colors = listOf(GradientStart, GradientEnd)
+    )
+    val primaryVertical = Brush.verticalGradient(
+        colors = listOf(GradientStart, GradientEnd)
+    )
+}
 
 @Composable
 fun PersonalExpenseManagerTheme(

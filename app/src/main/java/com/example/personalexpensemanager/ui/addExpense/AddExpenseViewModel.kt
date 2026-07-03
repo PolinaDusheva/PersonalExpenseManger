@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.personalexpensemanager.data.ExpenseDataService
 import com.example.personalexpensemanager.domain.Transaction
+import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
+import com.example.personalexpensemanager.domain.enums.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,20 +15,18 @@ import java.util.UUID
 
 class AddExpenseViewModel(
     private val dataService: ExpenseDataService
-): ViewModel() {
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<AddExpenseUIState>(
-        AddExpenseUIState.Loading)
+    private val _uiState = MutableStateFlow<AddExpenseUIState>(AddExpenseUIState.Loading)
     val uiState: StateFlow<AddExpenseUIState> = _uiState
-    init { loadCategories() }
 
-    private fun loadCategories() {
+    init {
         viewModelScope.launch {
-            try {
-                val categories = dataService.getCategories()
-                _uiState.value = AddExpenseUIState.Editing(categories)
-            } catch (e: Exception) {
-                _uiState.value = AddExpenseUIState.Error(e.message ?: "Грешка")
+            dataService.categories.collect { categories ->
+                val current = _uiState.value
+                if (current !is AddExpenseUIState.Saving && current !is AddExpenseUIState.Saved) {
+                    _uiState.value = AddExpenseUIState.Editing(categories)
+                }
             }
         }
     }
@@ -37,7 +37,8 @@ class AddExpenseViewModel(
         categoryId: String,
         date: LocalDate,
         description: String,
-        paymentMethod: PaymentMethod
+        paymentMethod: PaymentMethod,
+        transactionType: TransactionType
     ) {
         viewModelScope.launch {
             _uiState.value = AddExpenseUIState.Saving
@@ -47,8 +48,8 @@ class AddExpenseViewModel(
                     title = title,
                     amount = amount,
                     date = date,
-                    currency = '€',
-                    sign = '-',
+                    currency = Currency.EUR,
+                    type = transactionType,
                     categoryId = categoryId,
                     description = description,
                     paymentMethod = paymentMethod

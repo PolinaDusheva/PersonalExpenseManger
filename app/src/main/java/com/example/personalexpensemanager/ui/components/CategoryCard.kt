@@ -49,7 +49,7 @@ fun CategoryCard(
     ) {
 
         Icon(
-            imageVector = categoryIcon(category.iconName),
+            imageVector = categoryIconFilled(category.iconName),
             contentDescription = null,
             tint = colorResource(R.color.white),
             modifier = Modifier
@@ -74,23 +74,17 @@ fun CategoryCard(
         )
     }
 }
-fun categoryIcon(iconName: String): ImageVector = when (iconName) {
-    "restaurant" -> Icons.Filled.Star
-    "car" -> Icons.Filled.Star
-    "payments" -> Icons.Filled.Star
-    else -> Icons.Filled.Star
+
+
+@Preview(showBackground = true)
+@Composable
+fun CategoryCardPreview() {
+    PersonalExpenseManagerTheme {
+        CategoryCard(
+            category = Category(id = "1", iconName = "food", name = "Храна"),
+            color = Color(0xFF7E3FF2),
+            onClick = {},
+            onDelete = {}
+        )
+    }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun CategoryCardPreview() {
-//    PersonalExpenseManagerTheme {
-//        CategoryCard(
-//            category = Category(id = "1", iconName = "restaurant", name = "Храна", progress = 0.6f, percentage = "60%"),
-//            color = Color(0xFF7E3FF2),
-//            onClick = {},
-//            onDelete = {}
-//        )
-//    }
-//}

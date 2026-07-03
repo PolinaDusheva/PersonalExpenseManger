@@ -6,47 +6,39 @@ import androidx.lifecycle.viewModelScope
 import com.example.personalexpensemanager.data.ExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
+import com.example.personalexpensemanager.domain.enums.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(
     private val dataService: ExpenseDataService
 ): ViewModel() {
-    private val _uiState = MutableStateFlow<DashboardUIState>(DashboardUIState.Loading)
-    val uiState : StateFlow<DashboardUIState> = _uiState
 
-    init{load()}
-    fun refresh() {
-        load()
-    }
-
-    private fun load(){
-        viewModelScope.launch {
-            _uiState.value = DashboardUIState.Loading
-            try {
-                val transactions = dataService.getTransactions()
-                val categories = dataService.getCategories()
-                val categoriesMap = calculateCategoriesPercentage(categories,transactions)
-                val totalAmount = calculateTotalAmount(transactions)
-                val biggestExpense = calculateBiggestExpense(transactions)
-                _uiState.value = DashboardUIState.Success(
-                    transactions = transactions.reversed().take(5),
-                    categoriesMap = categoriesMap,
-                    totalAmount = totalAmount,
-                    biggestExpense = biggestExpense
-                )
-            } catch (e: Exception) {
-                _uiState.value = DashboardUIState.Error(e.message ?: "Error")
-            }
-        }
-    }
+    val uiState: StateFlow<DashboardUIState> = combine(
+        dataService.transactions,
+        dataService.categories
+    ) { transactions, categories ->
+        DashboardUIState.Success(
+            transactions = transactions.reversed().take(5),
+            categoriesMap = calculateCategoriesPercentage(categories, transactions),
+            totalAmount = calculateTotalAmount(transactions),
+            biggestExpense = calculateBiggestExpense(transactions)
+        ) as DashboardUIState
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = DashboardUIState.Loading
+    )
     private fun calculateTotalAmount(transactions: List<Transaction>): Double {
         var amount: Double = 0.0
         for(currentTransaction in transactions) {
             var currAmount = currentTransaction.amount
-            if (currentTransaction.sign == '-') {
-                currAmount *= -1;
+            if (currentTransaction.type == TransactionType.EXPENSE) {
+                currAmount *= -1
             }
             amount += currAmount
         }
@@ -56,7 +48,7 @@ class DashboardViewModel(
         var amount: Double = 0.0
         for(currentTransaction in transactions) {
             var currAmount = currentTransaction.amount
-            if (currentTransaction.sign == '-') {
+            if (currentTransaction.type == TransactionType.EXPENSE) {
                 amount += currAmount;
             }
         }
@@ -66,7 +58,7 @@ class DashboardViewModel(
         var maxExpense: Double = 0.0
         for(currentTransaction in transactions){
             var currAmount = currentTransaction.amount
-            if(currentTransaction.sign == '-' && currAmount>maxExpense){
+            if (currentTransaction.type == TransactionType.EXPENSE && currAmount > maxExpense) {
                 maxExpense = currAmount
             }
         }
@@ -80,7 +72,7 @@ class DashboardViewModel(
         for (category in categories){
             var categoryTotalAmount: Float = 0.0f
             for (transaction in transactions) {
-                if (category.id ==transaction.categoryId && transaction.sign == '-'){
+                if (category.id ==transaction.categoryId && transaction.type == TransactionType.EXPENSE){
                     categoryTotalAmount+=transaction.amount.toFloat()
                 }
             }
@@ -88,5 +80,6 @@ class DashboardViewModel(
         }
         return categoriesMap
     }
+    fun refresh() {}
 
 }

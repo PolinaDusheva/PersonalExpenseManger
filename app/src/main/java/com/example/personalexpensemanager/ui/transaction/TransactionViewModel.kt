@@ -3,67 +3,61 @@ package com.example.personalexpensemanager.ui.transaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.personalexpensemanager.data.ExpenseDataService
+import com.example.personalexpensemanager.domain.Transaction
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 class TransactionViewModel(
     private val dataService: ExpenseDataService
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<TransactionUIState>(TransactionUIState.Loading)
-    val uiState: StateFlow<TransactionUIState> = _uiState
+    private val _selectedCategory = MutableStateFlow<String?>(null)
+    private val _sortingType = MutableStateFlow(SortingType.NONE)
 
-    init { load() }
-
-    fun refresh() {
-        load()
-    }
-
-    fun load() {
-        viewModelScope.launch {
-            _uiState.value = TransactionUIState.Loading
-            try {
-                val transactions = dataService.getTransactions()
-                val categories = dataService.getCategories()
-                _uiState.value = TransactionUIState.Success(
-                    transactions = transactions,
-                    filteredTransactions = transactions,
-                    categories = categories,
-                    selectedCategory = null,
-                    sortingType = SortingType.NONE
-                )
-            } catch (e: Exception) {
-                _uiState.value = TransactionUIState.Error(e.message ?: "Грешка")
-            }
+    val uiState: StateFlow<TransactionUIState> = combine(
+        dataService.transactions,
+        dataService.categories,
+        _selectedCategory,
+        _sortingType
+    ) { transactions, categories, selectedCategory, sortingType ->
+        val reversedTransactions = transactions.reversed()
+        val filtered = if (selectedCategory == null) {
+            reversedTransactions
+        } else {
+            reversedTransactions.filter { it.categoryId == selectedCategory }
         }
-    }
+        val sorted = applySorting(filtered, sortingType)
+        TransactionUIState.Success(
+            transactions = reversedTransactions,
+            filteredTransactions = sorted,
+            categories = categories,
+            selectedCategory = selectedCategory,
+            sortingType = sortingType
+        ) as TransactionUIState
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = TransactionUIState.Loading
+    )
 
     fun filterByCategory(categoryId: String?) {
-        val current = _uiState.value as? TransactionUIState.Success ?: return
-        val filtered = if (categoryId == null) {
-            current.transactions
-        } else {
-            current.transactions.filter { it.categoryId == categoryId }
-        }
-        _uiState.value = current.copy(
-            filteredTransactions = filtered,
-            selectedCategory = categoryId
-        )
+        _selectedCategory.value = categoryId
     }
 
     fun sortBy(sortingType: SortingType) {
-        val current = _uiState.value as? TransactionUIState.Success ?: return
-        val sorted = when (sortingType) {
-            SortingType.AMOUNT -> current.filteredTransactions.sortedByDescending { it.amount }
-            SortingType.DATE -> current.filteredTransactions.sortedByDescending { it.date }
-            SortingType.NONE -> current.filteredTransactions
+        _sortingType.value = if (_sortingType.value == sortingType) SortingType.NONE else sortingType
+    }
+
+    private fun applySorting(transactions: List<Transaction>, sortingType: SortingType): List<Transaction> {
+        return when (sortingType) {
+            SortingType.AMOUNT -> transactions.sortedByDescending { it.amount }
+            SortingType.DATE -> transactions.sortedByDescending { it.date }
+            SortingType.NONE -> transactions
         }
-        _uiState.value = current.copy(
-            filteredTransactions = sorted,
-            sortingType = sortingType
-        )
     }
 
-
-    }
+    fun refresh() {}
+}

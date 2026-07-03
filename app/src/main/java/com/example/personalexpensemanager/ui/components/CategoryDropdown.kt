@@ -6,40 +6,48 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
-import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDropdown(
     categories: List<Category>,
-    selectedCategoryId: String?,
-    onCategorySelected: (String?) -> Unit,
+    selectedCategory: Category?,
+    onCategorySelected: (Category?) -> Unit,
     includeAll: Boolean = false,
-    allLabel: String = "Всички",
-    placeholder: String = "Изберете категория"
+    allLabel: String = stringResource(R.string.all_categories),
+    placeholder: String = stringResource(R.string.category_dropdown_placeholder),
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val label = categories.find { it.id == selectedCategoryId }?.name
+    val label = selectedCategory?.name
         ?: if (includeAll) allLabel else placeholder
 
-    Box {
-        FilterChip(
-            selected = selectedCategoryId != null,
+    Box(modifier = modifier) {
+        TransactionFilterChip(
+            text = label,
+            selected = selectedCategory != null,
             onClick = { expanded = true },
-            label = { Text(label) },
             trailingIcon = {
-                Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+                Icon(
+                    Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    tint = if (selectedCategory != null)
+                        MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurface
+                )
             }
         )
         DropdownMenu(
@@ -59,7 +67,7 @@ fun CategoryDropdown(
                 DropdownMenuItem(
                     text = { Text(category.name) },
                     onClick = {
-                        onCategorySelected(category.id)
+                        onCategorySelected(category)
                         expanded = false
                     }
                 )
@@ -67,20 +75,3 @@ fun CategoryDropdown(
         }
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun CategoryDropdownPreview() {
-//    PersonalExpenseManagerTheme {
-//        CategoryDropdown(
-//            categories = listOf(
-//                Category("1", "restaurant", "Храна", 0.6f, "60%"),
-//                Category("2", "car", "Транспорт", 0.3f, "30%")
-//            ),
-//            selectedCategoryId = null,
-//            onCategorySelected = {},
-//            includeAll = true
-//        )
-//    }
-//}

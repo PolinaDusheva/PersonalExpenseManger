@@ -21,6 +21,13 @@
     <string name="add_expense_save">Save</string>
     <string name="add_expense_saving">Saving…</string>
     <string name="payment_method">Payment method</string>
+    <string name="payment_method_card">Card</string>
+    <string name="payment_method_cash">Cash</string>
+    <string name="transaction_type">Transaction type</string>
+    <string name="transaction_type_expense">Expense</string>
+    <string name="transaction_type_income">Income</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
 
     <!-- Category dialog / card -->
     <string name="category_name_label">Name</string>
@@ -29,9 +36,27 @@
     <string name="category_save">Save</string>
     <string name="category_cancel">Cancel</string>
     <string name="category_delete">Delete</string>
+    <string name="categories_title">Categories</string>
+    <string name="categories_add_description">Add category</string>
+    <string name="categories_add_title">New category</string>
+    <string name="categories_edit_title">Edit category</string>
+    <string name="categories_empty_state">No categories yet. Tap + to add one.</string>
 
     <!-- CategoryDropdown -->
     <string name="category_dropdown_placeholder">Choose category</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_add">Add</string>
+    <string name="nav_categories">Categories</string>
+
+    <!-- Delete confirmation dialog -->
+    <string name="delete_confirm_title">Delete</string>
+    <string name="delete_confirm_message">Are you sure you want to delete “%1$s”?</string>
+
+    <!-- Transaction details (placeholder) -->
+    <string name="transaction_detail_placeholder">Transaction: %1$s</string>
 
     <!-- Date format -->
     <string name="date_format_pattern">dd.MM.yyyy</string>

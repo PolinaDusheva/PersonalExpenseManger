@@ -11,8 +11,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
 
@@ -22,11 +23,12 @@ data class BottomNavMenu(
     val icon: ImageVector
 )
 
-val bottomTabs = listOf(
-    BottomNavMenu(Screen.Dashboard, "Начало", Icons.Filled.Home),
-    BottomNavMenu(Screen.Transactions, "Транзакции", Icons.AutoMirrored.Filled.List),
-    BottomNavMenu(Screen.AddExpense, "Добави", Icons.Filled.Add),
-    BottomNavMenu(Screen.Categories, "Категории", Icons.Filled.Category)
+@Composable
+fun bottomTabs() = listOf(
+    BottomNavMenu(Screen.Dashboard, stringResource(R.string.nav_home), Icons.Filled.Home),
+    BottomNavMenu(Screen.Transactions, stringResource(R.string.nav_transactions), Icons.AutoMirrored.Filled.List),
+    BottomNavMenu(Screen.AddExpense, stringResource(R.string.nav_add), Icons.Filled.Add),
+    BottomNavMenu(Screen.Categories, stringResource(R.string.nav_categories), Icons.Filled.Category)
 )
 
 @Composable
@@ -35,7 +37,7 @@ fun BottomNavBar(
     onTabClick: (Screen) -> Unit
 ) {
     NavigationBar {
-        bottomTabs.forEach { tab ->
+        bottomTabs().forEach { tab ->
             NavigationBarItem(
                 selected = currentRoute == tab.screen.route,
                 onClick = { onTabClick(tab.screen) },

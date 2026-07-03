@@ -20,9 +20,8 @@ fun AddExpenseScreen(
     AddExpenseForm(
         categories = (state as? AddExpenseUIState.Editing)?.categories ?: emptyList(),
         isSaving = state is AddExpenseUIState.Saving,
-        onSave = { title, amount, categoryId, date, description, paymentMethod ->
-            viewModel.addExpense(title, amount, categoryId, date, description, paymentMethod)
-        },
-        onBack = onBack
+        onSave = { title, amount, categoryId, date, description, paymentMethod, transactionType ->
+            viewModel.addExpense(title, amount, categoryId, date, description, paymentMethod, transactionType)
+        }
     )
 }
