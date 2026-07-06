@@ -2,46 +2,50 @@ package com.example.personalexpensemanager.ui.addExpense
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.personalexpensemanager.data.ExpenseDataService
+import com.example.personalexpensemanager.data.IExpenseDataService
 import com.example.personalexpensemanager.domain.Transaction
 import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.domain.enums.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 
 class AddExpenseViewModel(
-    private val dataService: ExpenseDataService
+    private val dataService: IExpenseDataService
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<AddExpenseUIState>(AddExpenseUIState.Loading)
-    val uiState: StateFlow<AddExpenseUIState> = _uiState
+    private val _uiState = MutableStateFlow<IAddExpenseUIState>(IAddExpenseUIState.Loading)
+    val uiState: StateFlow<IAddExpenseUIState> = _uiState
 
     init {
         viewModelScope.launch {
-            dataService.categories.collect { categories ->
-                val current = _uiState.value
-                if (current !is AddExpenseUIState.Saving && current !is AddExpenseUIState.Saved) {
-                    _uiState.value = AddExpenseUIState.Editing(categories)
+            combine(dataService.categories, dataService.goals) { categories, goals -> categories to goals }
+                .collect { (categories, goals) ->
+                    val current = _uiState.value
+                    if (current !is IAddExpenseUIState.Saving && current !is IAddExpenseUIState.Saved) {
+                        _uiState.value = IAddExpenseUIState.Editing(categories, goals)
+                    }
                 }
-            }
         }
     }
 
     fun addExpense(
         title: String,
-        amount: Double,
-        categoryId: String,
+        amount: BigDecimal,
+        categoryId: String?,
         date: LocalDate,
         description: String,
         paymentMethod: PaymentMethod,
-        transactionType: TransactionType
+        transactionType: TransactionType,
+        goalId: String? = null
     ) {
         viewModelScope.launch {
-            _uiState.value = AddExpenseUIState.Saving
+            _uiState.value = IAddExpenseUIState.Saving
             try {
                 val transaction = Transaction(
                     id = UUID.randomUUID().toString(),
@@ -52,12 +56,13 @@ class AddExpenseViewModel(
                     type = transactionType,
                     categoryId = categoryId,
                     description = description,
-                    paymentMethod = paymentMethod
+                    paymentMethod = paymentMethod,
+                    goalId = goalId
                 )
                 dataService.addTransaction(transaction)
-                _uiState.value = AddExpenseUIState.Saved
+                _uiState.value = IAddExpenseUIState.Saved
             } catch (e: Exception) {
-                _uiState.value = AddExpenseUIState.Error(e.message ?: "Грешка")
+                _uiState.value = IAddExpenseUIState.Error(e.message ?: "Грешка")
             }
         }
     }

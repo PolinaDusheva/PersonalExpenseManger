@@ -10,7 +10,7 @@ import com.example.personalexpensemanager.ui.category.CategoriesViewModel
 class AppViewModelFactory(
 ) : ViewModelProvider.Factory {
 
-    private val dataService = FakeExpenseDataService()
+    val dataService = FakeIExpenseDataService()
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")

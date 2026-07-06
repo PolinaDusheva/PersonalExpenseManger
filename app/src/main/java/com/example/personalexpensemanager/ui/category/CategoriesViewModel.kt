@@ -2,7 +2,7 @@ package com.example.personalexpensemanager.ui.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.personalexpensemanager.data.ExpenseDataService
+import com.example.personalexpensemanager.data.IExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,15 +11,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CategoriesViewModel(
-    private val dataService: ExpenseDataService
+    private val dataService: IExpenseDataService
 ) : ViewModel() {
 
-    val uiState: StateFlow<CategoriesUIState> = dataService.categories
-        .map { categories -> CategoriesUIState.Success(categories) as CategoriesUIState }
+    val uiState: StateFlow<ICategoriesUIState> = dataService.categories
+        .map { categories -> ICategoriesUIState.Success(categories) as ICategoriesUIState }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = CategoriesUIState.Loading
+            initialValue = ICategoriesUIState.Loading
         )
 
     fun addCategory(name: String, iconName: String) {

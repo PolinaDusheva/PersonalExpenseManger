@@ -1,6 +1,5 @@
 package com.example.personalexpensemanager.ui.components
 
-import android.icu.number.Precision.currency
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,9 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,17 +29,21 @@ import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.time.LocalDate
 import com.example.personalexpensemanager.domain.enums.TransactionType
 import com.example.personalexpensemanager.domain.enums.Currency
+import com.example.personalexpensemanager.domain.enums.amountColorRes
+import com.example.personalexpensemanager.domain.enums.arrowColorRes
+import com.example.personalexpensemanager.domain.enums.circleColorRes
+import com.example.personalexpensemanager.domain.enums.icon
 import com.example.personalexpensemanager.domain.enums.signSymbol
 import com.example.personalexpensemanager.domain.enums.symbol
+import java.math.BigDecimal
 
 
 @Composable
 fun TransactionItem(transaction: Transaction) {
-    val isIncome = transaction.type == TransactionType.INCOME
-    val amountColor = if (isIncome) colorResource(R.color.transaction_income) else colorResource(R.color.transaction_expense)
-    val circleColor = if (isIncome) colorResource(R.color.transaction_income_circle) else colorResource(R.color.transaction_expense_circle)
-    val arrowColor = if (isIncome) colorResource(R.color.transaction_income_arrow) else colorResource(R.color.transaction_expense)
-    val arrowIcon = if (isIncome) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp
+    val amountColor = colorResource(transaction.type.amountColorRes)
+    val circleColor = colorResource(transaction.type.circleColorRes)
+    val arrowColor = colorResource(transaction.type.arrowColorRes)
+    val arrowIcon = transaction.type.icon
 
     Row(
         modifier = Modifier
@@ -53,7 +53,6 @@ fun TransactionItem(transaction: Transaction) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-
             Box(
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.transaction_icon_circle_size))
@@ -95,7 +94,7 @@ fun TransactionItemExpensePreview() {
             transaction = Transaction(
                 id = "1",
                 title = "Супермаркет",
-                amount = 150.0,
+                amount = BigDecimal("150.0"),
                 date = LocalDate.of(2026, 6, 24),
                 currency = Currency.EUR,
                 type = TransactionType.EXPENSE,
@@ -113,9 +112,14 @@ fun TransactionItemIncomePreview() {
     PersonalExpenseManagerTheme {
         TransactionItem(
             transaction = Transaction(
-                id = "2", title = "Заплата", amount = 2500.0,
-                date = LocalDate.of(2026, 6, 24), currency = Currency.EUR, type = TransactionType.EXPENSE,
-                categoryId = "1", description = "Месечна заплата", paymentMethod = PaymentMethod.CARD
+                id = "2",
+                title = "Заплата",
+                amount = BigDecimal("2500.0"),
+                date = LocalDate.of(2026, 6, 24),
+                currency = Currency.EUR, type = TransactionType.EXPENSE,
+                categoryId = "1",
+                description = "Месечна заплата",
+                paymentMethod = PaymentMethod.CARD
             )
         )
     }

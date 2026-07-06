@@ -12,16 +12,33 @@ fun AddExpenseScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(state) {
-        if (state is AddExpenseUIState.Saved) {
+        if (state is IAddExpenseUIState.Saved) {
             onBack()
         }
     }
 
     AddExpenseForm(
-        categories = (state as? AddExpenseUIState.Editing)?.categories ?: emptyList(),
-        isSaving = state is AddExpenseUIState.Saving,
-        onSave = { title, amount, categoryId, date, description, paymentMethod, transactionType ->
-            viewModel.addExpense(title, amount, categoryId, date, description, paymentMethod, transactionType)
+        categories = (state as? IAddExpenseUIState.Editing)?.categories ?: emptyList(),
+        goals = (state as? IAddExpenseUIState.Editing)?.goals ?: emptyList(),
+        isSaving = state is IAddExpenseUIState.Saving,
+        onSave = {
+            title,
+            amount,
+            categoryId,
+            date,
+            description,
+            paymentMethod,
+            transactionType,
+            goalId ->
+            viewModel.addExpense(
+                title,
+                amount,
+                categoryId,
+                date,
+                description,
+                paymentMethod,
+                transactionType,
+                goalId)
         }
     )
 }

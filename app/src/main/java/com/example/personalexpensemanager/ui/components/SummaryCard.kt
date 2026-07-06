@@ -16,11 +16,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.colorResource
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.enums.Currency
+import java.math.BigDecimal
 
 @Composable
 fun SummaryCard(
     title: String,
-    amount: Double,
+    amount: BigDecimal,
     currency: Currency,
     modifier: Modifier = Modifier,
 
@@ -64,7 +65,7 @@ fun SummaryCardPreview() {
     PersonalExpenseManagerTheme {
         SummaryCard(
             title = "Общо за месеца",
-            amount = 1250.50,
+            amount = BigDecimal(1250.50),
             currency = Currency.EUR
         )
     }

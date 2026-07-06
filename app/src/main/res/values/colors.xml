@@ -9,4 +9,6 @@
     <color name="transaction_income_circle">#FFEDE3FB</color>
     <color name="transaction_expense_circle">#FFFCE4E4</color>
     <color name="transaction_income_arrow">#FF7E3FF2</color>
+    <color name="transaction_transfer">#FF3A7BE5</color>
+    <color name="transaction_transfer_circle">#FFE3EEFC</color>
 </resources>

@@ -2,18 +2,18 @@ package com.example.personalexpensemanager.ui.transactionDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.personalexpensemanager.data.ExpenseDataService
+import com.example.personalexpensemanager.R
+import com.example.personalexpensemanager.data.IExpenseDataService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-
 class TransactionDetailsViewModel(
-    private val dataService : ExpenseDataService,
-    private val transactionId : String
-): ViewModel() {
-    private val _uiState = MutableStateFlow<TransactionDetailsUIState>(TransactionDetailsUIState.Loading)
-    val uiState: StateFlow<TransactionDetailsUIState> = _uiState
+    private val dataService: IExpenseDataService,
+    private val transactionId: String
+) : ViewModel() {
+    private val _uiState = MutableStateFlow<ITransactionDetailsUIState>(ITransactionDetailsUIState.Loading)
+    val uiState: StateFlow<ITransactionDetailsUIState> = _uiState
 
     init { load() }
 
@@ -22,15 +22,14 @@ class TransactionDetailsViewModel(
             try {
                 val transaction = dataService.getTransaction(transactionId)
                 if (transaction != null) {
-                    _uiState.value = TransactionDetailsUIState.Success(transaction)
+                    val category = dataService.getCategories().find { it.id == transaction.categoryId }
+                    _uiState.value = ITransactionDetailsUIState.Success(transaction, category)
                 } else {
-                    _uiState.value = TransactionDetailsUIState.Error("Транзакцията не е намерена")
+                    _uiState.value = ITransactionDetailsUIState.Error(R.string.transaction_not_found)
                 }
             } catch (e: Exception) {
-                _uiState.value = TransactionDetailsUIState.Error(e.message ?: "Грешка")
+                _uiState.value = ITransactionDetailsUIState.Error(R.string.generic_error)
             }
         }
     }
-
-
 }

@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,6 +26,7 @@ import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
 import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsScreen
+import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsViewModel
 
 @Composable
 fun AppNavigation() {
@@ -73,8 +76,14 @@ fun AppNavigation() {
                 arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
             ) { entry ->
                 val id = entry.arguments?.getString("transactionId") ?: return@composable
+                val viewModel: TransactionDetailsViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer { TransactionDetailsViewModel(factory.dataService, id) }
+                    }
+                )
                 TransactionDetailsScreen(
-                    transactionId = id
+                    viewModel = viewModel,
+                    onClose = { myNavigationManager.popBackStack() }
                 )
             }
             composable(Screen.AddExpense.route) {

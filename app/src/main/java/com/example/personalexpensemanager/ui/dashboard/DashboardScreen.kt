@@ -1,7 +1,6 @@
 package com.example.personalexpensemanager.ui.dashboard
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -26,28 +24,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
-import com.example.personalexpensemanager.data.FakeExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
 import com.example.personalexpensemanager.domain.enums.Currency
-import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.CategoryItem
 import com.example.personalexpensemanager.ui.components.SummaryCard
 import com.example.personalexpensemanager.ui.components.TransactionItem
-import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
-import java.time.LocalDate
+import java.math.BigDecimal
 
 @Composable
 fun SuccessScreen(
     transactions: List<Transaction>,
     categoriesMap: HashMap<Category, Float>,
-    totalAmount: Double,
-    biggestExpense: Double,
+    totalAmount: BigDecimal,
+    biggestExpense: BigDecimal,
     onRefresh: () -> Unit
 ){
     PullToRefreshBox(
@@ -189,18 +183,18 @@ fun DashboardScreen(viewModel: DashboardViewModel) {
 
 @Composable
 fun DashboardContent(
-    state: DashboardUIState,
+    state: IDashboardUIState,
     onRefresh: () -> Unit = {}) {
     when (val s = state) {
-        is DashboardUIState.Loading -> CircularProgressIndicator()
-        is DashboardUIState.Success -> SuccessScreen(
+        is IDashboardUIState.Loading -> CircularProgressIndicator()
+        is IDashboardUIState.Success -> SuccessScreen(
             transactions = s.transactions,
             categoriesMap = s.categoriesMap,
             totalAmount = s.totalAmount,
             biggestExpense = s.biggestExpense,
             onRefresh = onRefresh
         )
-        is DashboardUIState.Error   -> Text(s.message)
+        is IDashboardUIState.Error   -> Text(s.message)
     }
 }
 

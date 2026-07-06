@@ -2,14 +2,15 @@ package com.example.personalexpensemanager.ui.dashboard
 
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
+import java.math.BigDecimal
 
-sealed interface DashboardUIState {
-    data object Loading : DashboardUIState
+sealed interface IDashboardUIState {
+    data object Loading : IDashboardUIState
     data class Success(
         val transactions: List<Transaction>,
-        val totalAmount: Double,
-        val biggestExpense: Double,
+        val totalAmount: BigDecimal,
+        val biggestExpense: BigDecimal,
         val categoriesMap: HashMap<Category, Float>
-    ) : DashboardUIState
-    data class Error(val message: String) : DashboardUIState
+    ) : IDashboardUIState
+    data class Error(val message: String) : IDashboardUIState
 }

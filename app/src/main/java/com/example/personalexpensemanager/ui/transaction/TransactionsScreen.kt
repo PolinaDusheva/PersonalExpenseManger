@@ -16,15 +16,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
@@ -40,11 +37,12 @@ import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import com.example.personalexpensemanager.ui.components.TransactionFilterChip
+import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SuccessScreen(
-    state: TransactionUIState.Success,
+    state: ITransactionUIState.Success,
     onRefresh: () -> Unit,
     onCategorySelected: (String?) -> Unit,
     onSortSelected: (SortingType) -> Unit,
@@ -157,7 +155,7 @@ fun TransactionsScreen(
 
 @Composable
 fun TransactionsContent(
-    state: TransactionUIState,
+    state: ITransactionUIState,
     onBack: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onCategorySelected: (String?) -> Unit = {},
@@ -175,15 +173,15 @@ fun TransactionsContent(
             Headline(text = stringResource(R.string.transaction_history))
         }
         when (val s = state)  {
-            is TransactionUIState.Loading -> CircularProgressIndicator()
-            is TransactionUIState.Success -> SuccessScreen(
+            is ITransactionUIState.Loading -> CircularProgressIndicator()
+            is ITransactionUIState.Success -> SuccessScreen(
                 state = s,
                 onRefresh = onRefresh,
                 onCategorySelected = onCategorySelected,
                 onSortSelected = onSortSelected,
                 onTransactionClick = onTransactionClick
             )
-            is TransactionUIState.Error -> Text(s.message)
+            is ITransactionUIState.Error -> Text(s.message)
         }
     }
 }
@@ -194,12 +192,12 @@ fun TransactionsContent(
 fun TransactionScreenPreview() {
     PersonalExpenseManagerTheme {
         val list = listOf(
-            Transaction(id = "1", title = "Супермаркет", amount = 150.00, date = LocalDate.of(2026, 6, 6), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Седмично пазаруване", paymentMethod = PaymentMethod.CARD),
-            Transaction(id = "2", title = "Наем", amount = 660.00, date = LocalDate.of(2026, 6, 1), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Месечен наем", paymentMethod = PaymentMethod.CARD),
-            Transaction(id = "3", title = "Заплата", amount = 2500.00, date = LocalDate.of(2026, 6, 5), currency = Currency.EUR, type = TransactionType.INCOME, categoryId = "1", description = "Месечна заплата", paymentMethod = PaymentMethod.CARD)
+            Transaction(id = "1", title = "Супермаркет", amount = BigDecimal("150.00"), date = LocalDate.of(2026, 6, 6), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Седмично пазаруване", paymentMethod = PaymentMethod.CARD),
+            Transaction(id = "2", title = "Наем", amount = BigDecimal("660.00"), date = LocalDate.of(2026, 6, 1), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Месечен наем", paymentMethod = PaymentMethod.CARD),
+            Transaction(id = "3", title = "Заплата", amount = BigDecimal("2500.00"), date = LocalDate.of(2026, 6, 5), currency = Currency.EUR, type = TransactionType.INCOME, categoryId = "1", description = "Месечна заплата", paymentMethod = PaymentMethod.CARD)
         )
         TransactionsContent(
-            state = TransactionUIState.Success(
+            state = ITransactionUIState.Success(
                 transactions = list,
                 filteredTransactions = list,
                 categories = listOf(
@@ -219,12 +217,12 @@ fun TransactionScreenPreview() {
 fun TransactionScreenGroupedPreview() {
     PersonalExpenseManagerTheme {
         val list = listOf(
-            Transaction(id = "1", title = "Супермаркет", amount = 150.00, date = LocalDate.of(2026, 6, 6), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Седмично пазаруване", paymentMethod = PaymentMethod.CARD),
-            Transaction(id = "2", title = "Кафе", amount = 8.00, date = LocalDate.of(2026, 6, 6), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Сутрешно кафе", paymentMethod = PaymentMethod.CASH),
-            Transaction(id = "3", title = "Заплата", amount = 2500.00, date = LocalDate.of(2026, 6, 5), currency = Currency.EUR, type = TransactionType.INCOME, categoryId = "1", description = "Месечна заплата", paymentMethod = PaymentMethod.CARD)
+            Transaction(id = "1", title = "Супермаркет", amount = BigDecimal("150.00"), date = LocalDate.of(2026, 6, 6), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Седмично пазаруване", paymentMethod = PaymentMethod.CARD),
+            Transaction(id = "2", title = "Кафе", amount = BigDecimal("8.00"), date = LocalDate.of(2026, 6, 6), currency = Currency.EUR, type = TransactionType.EXPENSE, categoryId = "1", description = "Сутрешно кафе", paymentMethod = PaymentMethod.CASH),
+            Transaction(id = "3", title = "Заплата", amount = BigDecimal("2500.00"), date = LocalDate.of(2026, 6, 5), currency = Currency.EUR, type = TransactionType.INCOME, categoryId = "1", description = "Месечна заплата", paymentMethod = PaymentMethod.CARD)
         )
         TransactionsContent(
-            state = TransactionUIState.Success(
+            state = ITransactionUIState.Success(
                 transactions = list,
                 filteredTransactions = list,
                 categories = listOf(

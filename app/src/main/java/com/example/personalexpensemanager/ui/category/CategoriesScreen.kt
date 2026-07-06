@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -19,7 +18,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,7 +61,7 @@ fun CategoriesScreen(viewModel: CategoriesViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesContent(
-    state: CategoriesUIState,
+    state: ICategoriesUIState,
     onAdd: (name: String, iconName: String) -> Unit,
     onUpdate: (Category) -> Unit,
     onDelete: (categoryId: String) -> Unit
@@ -92,13 +90,13 @@ fun CategoriesContent(
             }
             Box(modifier = Modifier.fillMaxSize()) {
                 when (state) {
-                    is CategoriesUIState.Loading ->
+                    is ICategoriesUIState.Loading ->
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 
-                    is CategoriesUIState.Error ->
+                    is ICategoriesUIState.Error ->
                         Text(state.message, modifier = Modifier.align(Alignment.Center))
 
-                    is CategoriesUIState.Success -> {
+                    is ICategoriesUIState.Success -> {
                         if (state.categories.isEmpty()) {
                             Text(
                                 text = stringResource(R.string.categories_empty_state),
@@ -174,7 +172,7 @@ fun CategoriesContent(
 fun CategoriesContentPreview() {
     PersonalExpenseManagerTheme {
         CategoriesContent(
-            state = CategoriesUIState.Success(
+            state = ICategoriesUIState.Success(
                 categories = listOf(
                     Category(id = "1", iconName = "food", name = "Храна"),
                     Category(id = "2", iconName = "transport", name = "Транспорт"),
