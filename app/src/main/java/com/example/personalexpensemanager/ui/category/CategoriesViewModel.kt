@@ -2,46 +2,176 @@ package com.example.personalexpensemanager.ui.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.IExpenseDataService
 import com.example.personalexpensemanager.domain.Category
+import com.example.personalexpensemanager.domain.validation.notEmpty
+import com.example.personalexpensemanager.domain.validation.maxLength
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
+import kotlin.coroutines.cancellation.CancellationException
 
 class CategoriesViewModel(
     private val dataService: IExpenseDataService
 ) : ViewModel() {
 
-    val uiState: StateFlow<ICategoriesUIState> = dataService.categories
-        .map { categories -> ICategoriesUIState.Success(categories) as ICategoriesUIState }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ICategoriesUIState.Loading
-        )
+    private val retrySignal = MutableStateFlow(0)
+
+    val uiState: StateFlow<ICategoriesUIState> = retrySignal.flatMapLatest {
+        dataService.categories
+            .map { categories -> ICategoriesUIState.Success(categories) as ICategoriesUIState }
+            .catch { e -> emit(ICategoriesUIState.Error(R.string.error_load_categories)) }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ICategoriesUIState.Loading
+    )
+
+    fun retry() { retrySignal.value++ }
+
+    private val _formErrors = MutableStateFlow(CategoryFormErrors())
+    val formErrors: StateFlow<CategoryFormErrors> = _formErrors.asStateFlow()
+
+    private val _snackbarEvent = MutableSharedFlow<Int>()
+    val snackbarEvent: SharedFlow<Int> = _snackbarEvent.asSharedFlow()
+
+    private val _nameInput = MutableStateFlow("")
+    private var editingCategoryId: String? = null
+
+    init {
+        viewModelScope.launch {
+            _nameInput
+                .debounce(300)
+                .collect { name -> validateName(name) }
+        }
+    }
+
+    fun startEditing(category: Category?) {
+        editingCategoryId = category?.id
+        val initialName = category?.name ?: ""
+        _formErrors.value = CategoryFormErrors()
+        _nameInput.value = initialName
+        validateName(initialName)
+        if (category == null) {
+            _formErrors.update { it.copy(iconErrorResId = R.string.validation_category_icon_required) }
+        }
+    }
+
+    fun onNameChanged(name: String) {
+        _nameInput.value = name
+    }
+
+    fun onNameFieldTouched() {
+        _formErrors.update { it.copy(nameTouched = true) }
+    }
+
+    fun onIconSelected(iconName: String) {
+        _formErrors.update { it.copy(iconErrorResId = null, iconTouched = true) }
+    }
+
+    fun onIconTouched() {
+        _formErrors.update { it.copy(iconTouched = true) }
+    }
+
+    private fun validateName(name: String) {
+        val error = notEmpty(name, R.string.validation_category_name_empty)
+            ?: maxLength(name, 20, R.string.validation_category_name_too_long)
+        _formErrors.update { it.copy(nameErrorResId = error) }
+    }
+
+    private fun isDuplicateName(name: String): Boolean =
+        dataService.categories.value.any {
+            it.id != editingCategoryId && it.name.equals(name, ignoreCase = true)
+        }
 
     fun addCategory(name: String, iconName: String) {
+        val nameError = notEmpty(name, R.string.validation_category_name_empty)
+            ?: maxLength(name, 20, R.string.validation_category_name_too_long)
+        val iconError = if (iconName.isBlank()) R.string.validation_category_icon_required else null
+
+        if (nameError != null || iconError != null) {
+            _formErrors.value = _formErrors.value.copy(
+                nameErrorResId = nameError,
+                iconErrorResId = iconError,
+                nameTouched = true,
+                iconTouched = true
+            )
+            return
+        }
+
+        if (isDuplicateName(name)) {
+            viewModelScope.launch { _snackbarEvent.emit(R.string.validation_category_name_duplicate) }
+            return
+        }
+
         viewModelScope.launch {
             val category = Category(
-                id = java.util.UUID.randomUUID().toString(),
+                id = UUID.randomUUID().toString(),
                 name = name,
-                iconName = iconName
-            )
-            dataService.addCategory(category)
+                iconName = iconName)
+            try {
+                dataService.addCategory(category)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _snackbarEvent.emit(R.string.error_add_category)
+            }
         }
     }
 
     fun updateCategory(category: Category) {
+        val nameError = notEmpty(category.name, R.string.validation_category_name_empty)
+            ?: maxLength(category.name, 20, R.string.validation_category_name_too_long)
+        val iconError = if (category.iconName.isBlank()) R.string.validation_category_icon_required else null
+
+        if (nameError != null || iconError != null) {
+            _formErrors.value = _formErrors.value.copy(
+                nameErrorResId = nameError,
+                iconErrorResId = iconError,
+                nameTouched = true,
+                iconTouched = true
+            )
+            return
+        }
+
+        if (isDuplicateName(category.name)) {
+            viewModelScope.launch { _snackbarEvent.emit(R.string.validation_category_name_duplicate) }
+            return
+        }
+
         viewModelScope.launch {
-            dataService.updateCategory(category)
+            try {
+                dataService.updateCategory(category)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _snackbarEvent.emit(R.string.error_update_category)
+            }
         }
     }
 
     fun deleteCategory(categoryId: String) {
         viewModelScope.launch {
-            dataService.deleteCategory(categoryId)
+            try {
+                dataService.deleteCategory(categoryId)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _snackbarEvent.emit(R.string.error_delete_category)
+            }
         }
     }
 }

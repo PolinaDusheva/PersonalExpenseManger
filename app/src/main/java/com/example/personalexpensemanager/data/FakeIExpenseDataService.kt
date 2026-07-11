@@ -1,5 +1,6 @@
 package com.example.personalexpensemanager.data
 
+import com.example.personalexpensemanager.data.local.entity.toEntity
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Goal
 import com.example.personalexpensemanager.domain.Transaction
@@ -73,6 +74,14 @@ class FakeIExpenseDataService: IExpenseDataService {
 
     override suspend fun addTransaction(transaction: Transaction) {
         _transactions.update { it + transaction }
+    }
+
+    override suspend fun updateTransaction(transaction: Transaction) {
+        _transactions.update { list -> list.map { if (it.id == transaction.id) transaction else it } }
+    }
+
+    override suspend fun deleteTransaction(transactionId: String) {
+        _transactions.update { list -> list.filterNot { it.id == transactionId } }
     }
 
     override suspend fun addCategory(category: Category) {

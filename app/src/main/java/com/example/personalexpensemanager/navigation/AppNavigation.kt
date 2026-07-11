@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -31,7 +32,8 @@ import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetai
 @Composable
 fun AppNavigation() {
     val myNavigationManager = rememberNavController()
-    val factory = remember { AppViewModelFactory() }
+    val context = LocalContext.current
+    val factory = remember { AppViewModelFactory(context) }
 
     val backStackEntry by myNavigationManager.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -83,11 +85,29 @@ fun AppNavigation() {
                 )
                 TransactionDetailsScreen(
                     viewModel = viewModel,
-                    onClose = { myNavigationManager.popBackStack() }
+                    onClose = { myNavigationManager.popBackStack() },
+                    onEdit = { transactionId ->
+                        myNavigationManager.navigate(Screen.EditTransaction.createRoute(transactionId))
+                    }
                 )
             }
             composable(Screen.AddExpense.route) {
                 val viewModel: AddExpenseViewModel = viewModel(factory = factory)
+                AddExpenseScreen(
+                    viewModel = viewModel,
+                    onBack = { myNavigationManager.popBackStack() }
+                )
+            }
+            composable(
+                Screen.EditTransaction.route,
+                arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
+            ) { entry ->
+                val transactionId = entry.arguments?.getString("transactionId") ?: return@composable
+                val viewModel: AddExpenseViewModel = viewModel(
+                    factory = viewModelFactory {
+                        initializer { AddExpenseViewModel(factory.dataService, transactionId) }
+                    }
+                )
                 AddExpenseScreen(
                     viewModel = viewModel,
                     onBack = { myNavigationManager.popBackStack() }

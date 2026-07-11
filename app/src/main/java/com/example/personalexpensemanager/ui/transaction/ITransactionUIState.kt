@@ -18,5 +18,5 @@ sealed interface ITransactionUIState {
                 filteredTransactions.groupBy { it.date }
             } else null
     }
-    data class Error(val message: String) : ITransactionUIState
+    data class Error(val messageResId: Int) : ITransactionUIState
 }

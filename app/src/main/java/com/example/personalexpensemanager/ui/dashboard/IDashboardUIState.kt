@@ -12,5 +12,6 @@ sealed interface IDashboardUIState {
         val biggestExpense: BigDecimal,
         val categoriesMap: HashMap<Category, Float>
     ) : IDashboardUIState
-    data class Error(val message: String) : IDashboardUIState
+    data object Empty : IDashboardUIState
+    data class Error(val messageResId: Int) : IDashboardUIState
 }

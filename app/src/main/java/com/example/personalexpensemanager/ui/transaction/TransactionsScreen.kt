@@ -31,6 +31,7 @@ import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.domain.enums.TransactionType
 import com.example.personalexpensemanager.ui.components.CategoryDropdown
+import com.example.personalexpensemanager.ui.components.ErrorScreen
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.TransactionItem
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
@@ -147,6 +148,7 @@ fun TransactionsScreen(
         state = state.value,
         onBack = onBack,
         onRefresh = viewModel::refresh,
+        onRetry = viewModel::retry,
         onCategorySelected = viewModel::filterByCategory,
         onSortSelected = viewModel::sortBy,
         onTransactionClick = onTransactionClick
@@ -158,6 +160,7 @@ fun TransactionsContent(
     state: ITransactionUIState,
     onBack: () -> Unit = {},
     onRefresh: () -> Unit = {},
+    onRetry: () -> Unit = {},
     onCategorySelected: (String?) -> Unit = {},
     onSortSelected: (SortingType) -> Unit = {},
     onTransactionClick: (String) -> Unit = {}
@@ -172,16 +175,19 @@ fun TransactionsContent(
         Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
             Headline(text = stringResource(R.string.transaction_history))
         }
-        when (val s = state)  {
+        when (state)  {
             is ITransactionUIState.Loading -> CircularProgressIndicator()
             is ITransactionUIState.Success -> SuccessScreen(
-                state = s,
+                state = state,
                 onRefresh = onRefresh,
                 onCategorySelected = onCategorySelected,
                 onSortSelected = onSortSelected,
                 onTransactionClick = onTransactionClick
             )
-            is ITransactionUIState.Error -> Text(s.message)
+            is ITransactionUIState.Error -> ErrorScreen(
+                messageResId = state.messageResId,
+                onRetry = onRetry
+            )
         }
     }
 }

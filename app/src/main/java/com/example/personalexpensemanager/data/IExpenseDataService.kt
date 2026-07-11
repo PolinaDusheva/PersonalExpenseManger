@@ -16,6 +16,8 @@ interface IExpenseDataService {
         val goals: StateFlow<List<Goal>>
 
         suspend fun addTransaction(transaction: Transaction)
+        suspend fun updateTransaction(transaction: Transaction)
+        suspend fun deleteTransaction(transactionId: String)
         suspend fun addCategory(category: Category)
         suspend fun updateCategory(category: Category)
         suspend fun deleteCategory(categoryId: String)

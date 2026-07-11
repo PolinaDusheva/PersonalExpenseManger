@@ -14,41 +14,76 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
 import com.example.personalexpensemanager.domain.enums.Currency
-import com.example.personalexpensemanager.ui.components.Headline
+import com.example.personalexpensemanager.domain.enums.PaymentMethod
+import com.example.personalexpensemanager.domain.enums.TransactionType
 import com.example.personalexpensemanager.ui.components.CategoryItem
+import com.example.personalexpensemanager.ui.components.ErrorScreen
+import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.SummaryCard
 import com.example.personalexpensemanager.ui.components.TransactionItem
+import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Composable
-fun SuccessScreen(
-    transactions: List<Transaction>,
-    categoriesMap: HashMap<Category, Float>,
-    totalAmount: BigDecimal,
-    biggestExpense: BigDecimal,
-    onRefresh: () -> Unit
-){
+fun DashboardScreen(viewModel: DashboardViewModel) {
+    val state = viewModel.uiState.collectAsStateWithLifecycle()
+    DashboardContent(
+        state.value,
+        onRefresh = viewModel::refresh,
+        onRetry = viewModel::retry
+    )
+}
+
+@Composable
+fun DashboardContent(
+    state: IDashboardUIState,
+    onRefresh: () -> Unit = {},
+    onRetry: () -> Unit = {}
+) {
+    when (state) {
+        is IDashboardUIState.Loading -> CircularProgressIndicator()
+        is IDashboardUIState.Success -> SuccessScreen(
+            transactions = state.transactions,
+            categoriesMap = state.categoriesMap,
+            totalAmount = state.totalAmount,
+            biggestExpense = state.biggestExpense,
+            onRefresh = onRefresh
+        )
+        is IDashboardUIState.Empty -> EmptyScreen(onRefresh = onRefresh)
+        is IDashboardUIState.Error -> ErrorScreen(
+            messageResId = state.messageResId,
+            onRetry = onRetry
+        )
+    }
+}
+
+@Composable
+fun EmptyScreen(onRefresh: () -> Unit) {
     PullToRefreshBox(
         isRefreshing = false,
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize()
-    ){
+    ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.White
@@ -56,7 +91,7 @@ fun SuccessScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                item{
+                item {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -78,8 +113,140 @@ fun SuccessScreen(
                                 )
                         ) {
                             Spacer(
-                                modifier = Modifier.height(dimensionResource(R.dimen.dashboard_spacer_top)))
-                            //Headline(text = "Total")
+                                modifier = Modifier.height(dimensionResource(R.dimen.dashboard_spacer_top))
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dashboard_cards_spacing))
+                            ) {
+                                SummaryCard(
+                                    title = stringResource(R.string.total_for_month),
+                                    amount = BigDecimal.ZERO,
+                                    currency = Currency.EUR,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                SummaryCard(
+                                    title = stringResource(R.string.biggest_expense),
+                                    amount = BigDecimal.ZERO,
+                                    currency = Currency.EUR,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.padding_small))
+                        )
+                        Headline(text = stringResource(R.string.recent_transactions))
+                    }
+                }
+
+                item {
+                    Surface(
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                            .fillMaxWidth()
+                            .height(320.dp),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.transaction_card_corner_radius)),
+                        color = Color.White,
+                        shadowElevation = 4.dp
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.dashboard_no_transactions),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.dashboard_section_spacer))
+                        )
+                        Headline(text = stringResource(R.string.categories_overview))
+                    }
+                }
+
+                item {
+                    Text(
+                        text = stringResource(R.string.dashboard_no_categories),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = dimensionResource(R.dimen.padding_horizontal),
+                                vertical = dimensionResource(R.dimen.padding_standard)
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SuccessScreen(
+    transactions: List<Transaction>,
+    categoriesMap: HashMap<Category, Float>,
+    totalAmount: BigDecimal,
+    biggestExpense: BigDecimal,
+    onRefresh: () -> Unit
+) {
+    PullToRefreshBox(
+        isRefreshing = false,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.White
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.dashboard_header_height))
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.waves_bg),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            alpha = 1f
+                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    horizontal = dimensionResource(R.dimen.padding_horizontal),
+                                    vertical = dimensionResource(R.dimen.padding_horizontal)
+                                )
+                        ) {
+                            Spacer(
+                                modifier = Modifier.height(dimensionResource(R.dimen.dashboard_spacer_top))
+                            )
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dashboard_cards_spacing))
@@ -100,6 +267,7 @@ fun SuccessScreen(
                         }
                     }
                 }
+
                 item {
                     Column(
                         modifier = Modifier
@@ -107,10 +275,12 @@ fun SuccessScreen(
                     ) {
                         Spacer(
                             modifier = Modifier
-                                .height(dimensionResource(R.dimen.padding_small)))
+                                .height(dimensionResource(R.dimen.padding_small))
+                        )
                         Headline(text = stringResource(R.string.recent_transactions))
                     }
                 }
+
                 items(
                     items = transactions,
                     key = { "transaction_${it.id}" }
@@ -134,23 +304,26 @@ fun SuccessScreen(
                         Column(
                             modifier = Modifier.padding(
                                 horizontal = dimensionResource(R.dimen.padding_standard),
-
-                                )
+                            )
                         ) {
                             TransactionItem(transaction)
                         }
                     }
                 }
+
                 item {
                     Column(
                         modifier = Modifier
                             .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                     ) {
-                        Spacer(modifier = Modifier
-                            .height(dimensionResource(R.dimen.dashboard_section_spacer)))
+                        Spacer(
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.dashboard_section_spacer))
+                        )
                         Headline(text = stringResource(R.string.categories_overview))
                     }
                 }
+
                 val categoriesEntries = categoriesMap.entries.toList()
                 items(
                     items = categoriesEntries,
@@ -158,64 +331,44 @@ fun SuccessScreen(
                 ) { categoryEntry ->
                     Box(
                         modifier = Modifier
-                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
+                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                    ) {
                         CategoryItem(
-                            category =categoryEntry.key,
-                            categorySize =categoryEntry.value
+                            category = categoryEntry.key,
+                            categorySize = categoryEntry.value
                         )
                     }
                 }
-
             }
         }
     }
 }
 
-
+@Preview(showBackground = true, name = "Dashboard with data")
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel) {
-    val state = viewModel.uiState.collectAsStateWithLifecycle()
-    DashboardContent(
-        state.value,
-        onRefresh = viewModel::refresh
+fun DashboardPreview() {
+    PersonalExpenseManagerTheme {
+        DashboardContent(
+            state = IDashboardUIState.Success(
+                transactions = listOf(
+                    Transaction("1", "Супермаркет", BigDecimal("150.00"), LocalDate.of(2026, 7, 5), Currency.EUR, TransactionType.EXPENSE, "1", "Пазаруване", PaymentMethod.CARD),
+                    Transaction("2", "Заплата", BigDecimal("2500.00"), LocalDate.of(2026, 7, 5), Currency.EUR, TransactionType.INCOME, "1", "Месечна заплата", PaymentMethod.CARD)
+                ),
+                categoriesMap = hashMapOf(
+                    Category("1", "food", "Храна") to 0.6f,
+                    Category("2", "transport", "Транспорт") to 0.4f
+                ),
+                totalAmount = BigDecimal("150.00"),
+                biggestExpense = BigDecimal("150.00")
+            )
         )
-}
-
-@Composable
-fun DashboardContent(
-    state: IDashboardUIState,
-    onRefresh: () -> Unit = {}) {
-    when (val s = state) {
-        is IDashboardUIState.Loading -> CircularProgressIndicator()
-        is IDashboardUIState.Success -> SuccessScreen(
-            transactions = s.transactions,
-            categoriesMap = s.categoriesMap,
-            totalAmount = s.totalAmount,
-            biggestExpense = s.biggestExpense,
-            onRefresh = onRefresh
-        )
-        is IDashboardUIState.Error   -> Text(s.message)
     }
 }
 
-
-//@Preview(showBackground = true)
-//@Composable
-//fun DashboardPreview() {
-//    PersonalExpenseManagerTheme {
-//        DashboardContent(
-//            state = DashboardUIState.Success(
-//                transactions = listOf(
-//                    Transaction("1", "Супермаркет", 150.0, LocalDate.of(2026, 6, 1), '€', '-', "c1", "Пазаруване", PaymentMethod.CARD),
-//                    Transaction("2", "Заплата", 2500.0, LocalDate.of(2026, 6, 5), '€', '+', "c1", "Месечна заплата", PaymentMethod.CARD),
-//                ),
-//                categories = listOf(
-//                    Category("c1", "restaurant", "Храна", 0.6f, "60%"),
-//                    Category("c2", "car", "Транспорт", 0.3f, "30%")
-//                ),
-//                totalAmount = 2500.0,
-//                biggestExpense = 660.0
-//            )
-//        )
-//    }
-//}
+@Preview(showBackground = true, name = "Dashboard empty")
+@Composable
+fun DashboardEmptyPreview() {
+    PersonalExpenseManagerTheme {
+        DashboardContent(state = IDashboardUIState.Empty)
+    }
+}

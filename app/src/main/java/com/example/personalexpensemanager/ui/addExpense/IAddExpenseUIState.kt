@@ -8,5 +8,5 @@ sealed interface IAddExpenseUIState {
     data class Editing(val categories: List<Category>, val goals: List<Goal> = emptyList()) : IAddExpenseUIState
     data object Saving : IAddExpenseUIState
     data object Saved : IAddExpenseUIState
-    data class Error(val message: String) : IAddExpenseUIState
+    data class Error(val messageResId: Int) : IAddExpenseUIState
 }

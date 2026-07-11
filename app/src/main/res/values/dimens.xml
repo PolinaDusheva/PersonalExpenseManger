@@ -63,6 +63,7 @@
     <dimen name="transaction_detail_avatar_icon_size">36dp</dimen>
     <dimen name="transaction_detail_badge_size">28dp</dimen>
     <dimen name="transaction_detail_badge_icon_size">16dp</dimen>
+    <dimen name="transaction_detail_header_height">280dp</dimen>
     <dimen name="transaction_detail_chip_padding_horizontal">12dp</dimen>
     <dimen name="transaction_detail_chip_padding_vertical">6dp</dimen>
     <dimen name="transaction_detail_chip_icon_size">18dp</dimen>
@@ -70,4 +71,5 @@
     <dimen name="transaction_detail_card_corner_radius">16dp</dimen>
     <dimen name="transaction_detail_card_padding">16dp</dimen>
     <dimen name="transaction_detail_card_row_spacing">10dp</dimen>
+    <dimen name="add_expense_header_height">140dp</dimen>
 </resources>
