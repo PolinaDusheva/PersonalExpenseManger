@@ -6,6 +6,8 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.IExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
+import com.example.personalexpensemanager.domain.TransactionCalculator
+import com.example.personalexpensemanager.domain.TransactionCalculator.calculateTotalExpenses
 import com.example.personalexpensemanager.domain.enums.TransactionType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,12 +33,12 @@ class DashboardViewModel(
             if (transactions.isEmpty() && categories.isEmpty()) {
                 IDashboardUIState.Empty
             } else {
-                val currentMonthTransactions = filterCurrentMonth(transactions)
+                val currentMonthTransactions = TransactionCalculator.filterCurrentMonth(transactions)
                 IDashboardUIState.Success(
                     transactions = transactions.reversed().take(5),
                     categoriesMap = calculateCategoriesPercentage(categories, currentMonthTransactions),
-                    totalAmount = calculateTotalExpenses(currentMonthTransactions),
-                    biggestExpense = calculateBiggestExpense(currentMonthTransactions)
+                    totalAmount = TransactionCalculator.calculateTotalExpenses(currentMonthTransactions),
+                    biggestExpense = TransactionCalculator.calculateBiggestExpense(currentMonthTransactions)
                 )
             }
         }.catch { e ->
@@ -50,32 +52,6 @@ class DashboardViewModel(
 
     fun retry() { retrySignal.value++ }
 
-
-    private fun filterCurrentMonth(transactions: List<Transaction>): List<Transaction> {
-        val now = LocalDate.now()
-        return transactions.filter { it.date.year == now.year && it.date.month == now.month }
-    }
-
-    private fun calculateTotalExpenses(transactions: List<Transaction>): BigDecimal {
-        var amount: BigDecimal = BigDecimal.ZERO
-        for (currentTransaction in transactions) {
-            if (currentTransaction.type == TransactionType.EXPENSE) {
-                amount += currentTransaction.amount
-            }
-        }
-        return amount
-    }
-
-    private fun calculateBiggestExpense(transactions: List<Transaction>): BigDecimal {
-        var maxExpense: BigDecimal = BigDecimal.ZERO
-        for (currentTransaction in transactions) {
-            val currAmount = currentTransaction.amount
-            if (currentTransaction.type == TransactionType.EXPENSE && currAmount > maxExpense) {
-                maxExpense = currAmount
-            }
-        }
-        return maxExpense
-    }
 
     private fun calculateCategoriesPercentage(
         categories: List<Category>,

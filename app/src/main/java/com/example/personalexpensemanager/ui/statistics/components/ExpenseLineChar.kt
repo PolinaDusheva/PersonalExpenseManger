@@ -56,7 +56,7 @@ fun ExpenseLineChart(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 8.dp, shape = cardShape)
+            .shadow(elevation = 4.dp, shape = cardShape)
             .background(Color.White, cardShape)
             .padding(20.dp)
     ) {
@@ -64,11 +64,22 @@ fun ExpenseLineChart(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = selected.date.format(DateTimeFormatter.ofPattern("d MMM")),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF6B7280)
-            )
+            Column {
+                Text(
+                    text = selected.date.format(DateTimeFormatter.ofPattern("d MMM")),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF6B7280)
+                )
+                if (selected.titles.isNotEmpty()) {
+                    Text(
+                        text = selected.titles.joinToString(", "),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF9CA3AF),
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
+            }
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = formatAmount(selected.amount),
@@ -168,13 +179,13 @@ fun ExpenseLineChartPreview() {
     PersonalExpenseManagerTheme {
         ExpenseLineChart(
             dailySpending = listOf(
-                DailySpend(LocalDate.of(2026, 7, 1), BigDecimal("20")),
-                DailySpend(LocalDate.of(2026, 7, 2), BigDecimal("45")),
-                DailySpend(LocalDate.of(2026, 7, 3), BigDecimal("30")),
-                DailySpend(LocalDate.of(2026, 7, 4), BigDecimal("80")),
-                DailySpend(LocalDate.of(2026, 7, 5), BigDecimal("60")),
-                DailySpend(LocalDate.of(2026, 7, 6), BigDecimal("95")),
-                DailySpend(LocalDate.of(2026, 7, 7), BigDecimal("40"))
+                DailySpend(LocalDate.of(2026, 7, 1), BigDecimal("20"), listOf("Lunch")),
+                DailySpend(LocalDate.of(2026, 7, 2), BigDecimal("45"), listOf("Groceries", "Coffee")),
+                DailySpend(LocalDate.of(2026, 7, 3), BigDecimal("30"), listOf("Transport")),
+                DailySpend(LocalDate.of(2026, 7, 4), BigDecimal("80"), listOf("Dinner")),
+                DailySpend(LocalDate.of(2026, 7, 5), BigDecimal("60"), listOf("Shopping")),
+                DailySpend(LocalDate.of(2026, 7, 6), BigDecimal("95"), listOf("Rent")),
+                DailySpend(LocalDate.of(2026, 7, 7), BigDecimal("40"), listOf("Taxi"))
             )
         )
     }

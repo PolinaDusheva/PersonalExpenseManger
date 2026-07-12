@@ -21,6 +21,6 @@ sealed interface IStatisticsUIState {
 
     data class Error(val messageResId: Int) : IStatisticsUIState
 
-    data class DailySpend(val date: LocalDate, val amount: BigDecimal)
+    data class DailySpend(val date: LocalDate, val amount: BigDecimal, val titles: List<String>)
     data class CategorySpend(val categoryName: String, val amount: BigDecimal)
 }

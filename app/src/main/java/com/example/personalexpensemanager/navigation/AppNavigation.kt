@@ -28,7 +28,8 @@ import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
 import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsScreen
 import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsViewModel
-
+import com.example.personalexpensemanager.ui.statistics.StatisticsScreen
+import com.example.personalexpensemanager.ui.statistics.StatisticsViewModel
 @Composable
 fun AppNavigation() {
     val myNavigationManager = rememberNavController()
@@ -61,7 +62,12 @@ fun AppNavigation() {
         ) {
             composable(Screen.Dashboard.route) {
                 val viewModel: DashboardViewModel = viewModel(factory = factory)
-                DashboardScreen(viewModel = viewModel)
+                DashboardScreen(
+                    viewModel = viewModel,
+                    onTransactionClick = { id ->
+                        myNavigationManager.navigate(Screen.TransactionDetail.createRoute(id))
+                    }
+                )
             }
             composable(Screen.Transactions.route) {
                 val viewModel: TransactionViewModel = viewModel(factory = factory)
@@ -116,6 +122,10 @@ fun AppNavigation() {
             composable(Screen.Categories.route) {
                 val viewModel: CategoriesViewModel = viewModel(factory = factory)
                 CategoriesScreen(viewModel = viewModel)
+            }
+            composable(Screen.Statistics.route) {
+                val viewModel: StatisticsViewModel = viewModel(factory = factory)
+                StatisticsScreen(viewModel = viewModel)
             }
         }
     }

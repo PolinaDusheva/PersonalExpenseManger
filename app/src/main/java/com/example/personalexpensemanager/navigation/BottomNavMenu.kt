@@ -5,7 +5,9 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Radar
+import androidx.compose.material.icons.filled.StackedBarChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -27,10 +29,11 @@ data class BottomNavMenu(
 @Composable
 fun bottomTabs() = listOf(
     BottomNavMenu(Screen.Dashboard, stringResource(R.string.nav_home), Icons.Filled.Home),
-    BottomNavMenu(Screen.Transactions, stringResource(R.string.nav_payments), Icons.AutoMirrored.Filled.List),
+    BottomNavMenu(Screen.Transactions, stringResource(R.string.nav_payments), Icons.Filled.Payments),
     BottomNavMenu(Screen.AddExpense, stringResource(R.string.nav_add), Icons.Filled.Add),
-    BottomNavMenu(Screen.Goals, stringResource(R.string.nav_goals), Icons.Filled.Radar),
-    BottomNavMenu(Screen.Categories, stringResource(R.string.nav_categories), Icons.Filled.Category)
+    //BottomNavMenu(Screen.Goals, stringResource(R.string.nav_goals), Icons.Filled.Radar),
+    BottomNavMenu(Screen.Categories, stringResource(R.string.nav_categories), Icons.Filled.Category),
+    BottomNavMenu(Screen.Statistics, stringResource(R.string.statistics_title), Icons.Filled.StackedBarChart),
 )
 
 @Composable

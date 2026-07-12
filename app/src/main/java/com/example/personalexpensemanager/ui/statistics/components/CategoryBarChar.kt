@@ -45,7 +45,7 @@ fun CategoryBarChart(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 8.dp, shape = cardShape)
+            .shadow(elevation = 4.dp, shape = cardShape)
             .background(Color.White, cardShape)
             .padding(20.dp)
             .height(200.dp),

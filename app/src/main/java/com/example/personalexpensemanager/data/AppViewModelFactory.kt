@@ -11,7 +11,7 @@ import com.example.personalexpensemanager.ui.category.CategoriesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-
+import com.example.personalexpensemanager.ui.statistics.StatisticsViewModel
 class AppViewModelFactory(
     context: Context
 ) : ViewModelProvider.Factory {
@@ -39,6 +39,9 @@ class AppViewModelFactory(
 
             modelClass.isAssignableFrom(CategoriesViewModel::class.java) ->
                 CategoriesViewModel(dataService = dataService) as T
+
+            modelClass.isAssignableFrom(StatisticsViewModel::class.java) ->
+                StatisticsViewModel(dataService = dataService) as T
 
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }

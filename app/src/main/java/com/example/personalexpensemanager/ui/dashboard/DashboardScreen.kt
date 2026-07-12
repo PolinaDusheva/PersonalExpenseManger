@@ -45,12 +45,16 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel) {
+fun DashboardScreen(
+    viewModel: DashboardViewModel,
+    onTransactionClick: (String) -> Unit = {}
+) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
     DashboardContent(
         state.value,
         onRefresh = viewModel::refresh,
-        onRetry = viewModel::retry
+        onRetry = viewModel::retry,
+        onTransactionClick = onTransactionClick
     )
 }
 
@@ -58,7 +62,8 @@ fun DashboardScreen(viewModel: DashboardViewModel) {
 fun DashboardContent(
     state: IDashboardUIState,
     onRefresh: () -> Unit = {},
-    onRetry: () -> Unit = {}
+    onRetry: () -> Unit = {},
+    onTransactionClick: (String) -> Unit = {}
 ) {
     when (state) {
         is IDashboardUIState.Loading -> CircularProgressIndicator()
@@ -67,7 +72,8 @@ fun DashboardContent(
             categoriesMap = state.categoriesMap,
             totalAmount = state.totalAmount,
             biggestExpense = state.biggestExpense,
-            onRefresh = onRefresh
+            onRefresh = onRefresh,
+            onTransactionClick = onTransactionClick
         )
         is IDashboardUIState.Empty -> EmptyScreen(onRefresh = onRefresh)
         is IDashboardUIState.Error -> ErrorScreen(
@@ -209,7 +215,8 @@ fun SuccessScreen(
     categoriesMap: HashMap<Category, Float>,
     totalAmount: BigDecimal,
     biggestExpense: BigDecimal,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onTransactionClick: (String) -> Unit = {}
 ) {
     PullToRefreshBox(
         isRefreshing = false,
@@ -294,6 +301,7 @@ fun SuccessScreen(
                         bottomEnd = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp
                     )
                     Surface(
+                        onClick = { onTransactionClick(transaction.id) },
                         modifier = Modifier
                             .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                             .fillMaxWidth(),

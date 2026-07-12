@@ -16,6 +16,7 @@
     <dimen name="summary_card_padding_top">20dp</dimen>
     <dimen name="summary_card_padding_end">10dp</dimen>
     <dimen name="summary_card_padding_bottom">20dp</dimen>
+    <dimen name="summary_card_rounded_corners">20dp</dimen>
     <dimen name="summary_card_content_spacing">8dp</dimen>
     <dimen name="summary_card_elevation">4dp</dimen>
 
@@ -23,7 +24,7 @@
     <dimen name="transaction_row_vertical_padding">10dp</dimen>
     <dimen name="transaction_icon_circle_size">44dp</dimen>
     <dimen name="transaction_icon_text_spacing">12dp</dimen>
-    <dimen name="transaction_card_corner_radius">12dp</dimen>
+    <dimen name="transaction_card_corner_radius">20dp</dimen>
     <dimen name="transaction_card_elevation">4dp</dimen>
 
     <!-- CategoryItem (Dashboard progress row) -->
