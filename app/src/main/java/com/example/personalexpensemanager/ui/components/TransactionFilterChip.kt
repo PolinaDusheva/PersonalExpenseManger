@@ -18,8 +18,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
 @Composable
 fun TransactionFilterChip(
@@ -29,7 +31,7 @@ fun TransactionFilterChip(
     modifier: Modifier = Modifier,
     trailingIcon: (@Composable () -> Unit)? = null
 ) {
-    val shape = RoundedCornerShape(50.dp)
+    val shape = RoundedCornerShape(dimensionResource(R.dimen.filter_chip_corner_radius))
     Box(
         modifier = modifier
             .then(
@@ -39,13 +41,13 @@ fun TransactionFilterChip(
                         .background(brush = GradientGraphics.primaryHorizontal, shape = shape)
                 } else {
                     Modifier
-                        .shadow(elevation = 3.dp, shape = shape)
+                        .shadow(elevation = dimensionResource(R.dimen.filter_chip_elevation), shape = shape)
                         .background(Color.White, shape)
-                        .border(width = 1.dp, brush = GradientGraphics.primaryHorizontal, shape = shape)
+                        .border(width = dimensionResource(R.dimen.filter_chip_border_width), brush = GradientGraphics.primaryHorizontal, shape = shape)
                 }
             )
             .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = dimensionResource(R.dimen.padding_standard), vertical = dimensionResource(R.dimen.padding_small))
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -53,7 +55,7 @@ fun TransactionFilterChip(
                 color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
             )
             if (trailingIcon != null) {
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(dimensionResource(R.dimen.statistics_card_spacing)))
                 trailingIcon()
             }
         }

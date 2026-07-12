@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -64,6 +66,7 @@ fun AddExpenseForm(
     onDescriptionTouched: () -> Unit,
     onDateSelected: (LocalDate?) -> Unit,
     onCategorySelected: () -> Unit,
+    onNavigateToCategories: () -> Unit = {},
     onSave: (String, BigDecimal, String?, LocalDate?, String, PaymentMethod, TransactionType, String?) -> Unit
 ) {
     val isEdit = existingTransaction != null
@@ -132,7 +135,7 @@ fun AddExpenseForm(
 
             Column(
                 modifier = Modifier
-                    .weight(0.55f)
+                    .weight(0.75f)
                     .padding(horizontal = dimensionResource(R.dimen.add_expense_padding))
                     .padding(top = dimensionResource(R.dimen.add_expense_padding))
                     .verticalScroll(rememberScrollState()),
@@ -239,15 +242,32 @@ fun AddExpenseForm(
                         )
                     } else {
                         Column {
-                            CategoryDropdown(
-                                categories = categories,
-                                selectedCategory = selectedCategory,
-                                onCategorySelected = { category ->
-                                    selectedCategory = category
-                                    onCategorySelected()
-                                },
-                                includeAll = false
-                            )
+                            if (categories.isEmpty() && !isSaving) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.categories_empty_state),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray
+                                    )
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                                    PrimaryButton(
+                                        text = stringResource(R.string.categories_add_title),
+                                        onClick = onNavigateToCategories
+                                    )
+                                }
+                            } else {
+                                CategoryDropdown(
+                                    categories = categories,
+                                    selectedCategory = selectedCategory,
+                                    onCategorySelected = {
+                                        selectedCategory = it
+                                        onCategorySelected()
+                                    }
+                                )
+                            }
                             if (formErrors.categoryTouched && formErrors.categoryErrorResId != null) {
                                 Text(
                                     text = stringResource(formErrors.categoryErrorResId),
@@ -262,7 +282,7 @@ fun AddExpenseForm(
 
             Column(
                 modifier = Modifier
-                    .weight(0.45f)
+                    .weight(0.25f)
                     .padding(horizontal = dimensionResource(R.dimen.add_expense_padding)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {

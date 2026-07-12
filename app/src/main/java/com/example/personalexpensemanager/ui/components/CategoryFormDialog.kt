@@ -50,7 +50,7 @@ fun CategoryFormDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 400.dp)
+                    .heightIn(max = dimensionResource(R.dimen.category_dialog_max_height))
                     .verticalScroll(rememberScrollState())
             ) {
                 OutlinedTextField(
@@ -80,7 +80,7 @@ fun CategoryFormDialog(
                 Spacer(Modifier.height(dimensionResource(R.dimen.category_dialog_field_spacing)))
 
                 Text(stringResource(R.string.category_icon_label))
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
 
                 IconPickerGrid(
                     selectedIcon = icon,

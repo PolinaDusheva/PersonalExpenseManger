@@ -15,7 +15,8 @@ import com.example.personalexpensemanager.R
 fun TransactionInfoCard(rows: List<Pair<String, String>>) {
     Surface(
         shape = RoundedCornerShape(dimensionResource(R.dimen.transaction_detail_card_corner_radius)),
-        color = Color.White
+        color = Color.White,
+        shadowElevation = dimensionResource(R.dimen.transaction_detail_info_card_elevation)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(R.dimen.transaction_detail_card_padding)),

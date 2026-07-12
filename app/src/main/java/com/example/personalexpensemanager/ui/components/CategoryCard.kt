@@ -42,7 +42,7 @@ fun CategoryCard(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1.6f)
-            .shadow(elevation = 8.dp, shape = shape)
+            .shadow(elevation = dimensionResource(R.dimen.category_card_elevation), shape = shape)
             .clip(shape)
             .background(Brush.linearGradient(gradient))
             .clickable { onClick() }

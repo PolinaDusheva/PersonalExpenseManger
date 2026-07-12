@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,68 +44,68 @@ fun TransactionDetailsHeader(
     transaction: Transaction,
     category: Category?,
     onClose: () -> Unit,
-    onShare: () -> Unit
+    onDelete: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(dimensionResource(R.dimen.transaction_detail_header_height))
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.waves_bg),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.transaction_detail_header_height))
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.waves_bg),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(dimensionResource(R.dimen.padding_horizontal)),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = onClose, modifier = Modifier.background(Color.White, CircleShape)) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.action_close))
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(dimensionResource(R.dimen.padding_horizontal)),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = onClose, modifier = Modifier.background(Color.White, CircleShape)) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.action_close))
+                    }
+                    IconButton(onClick = onDelete, modifier = Modifier.background(Color.White, CircleShape)) {
+                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.transaction_detail_delete))
+                    }
                 }
-                IconButton(onClick = onShare, modifier = Modifier.background(Color.White, CircleShape)) {
-                    Icon(Icons.Filled.Download, contentDescription = stringResource(R.string.action_download))
-                }
-            }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                TransactionAvatar(transaction)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TransactionAvatar(transaction)
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
 
-                Text(
-                    text = stringResource(
-                        R.string.transaction_detail_paid_via,
-                        stringResource(
-                            if (transaction.paymentMethod == PaymentMethod.CARD) R.string.payment_method_card
-                            else R.string.payment_method_cash
-                        )
-                    ),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                    Text(
+                        text = stringResource(
+                            R.string.transaction_detail_paid_via,
+                            stringResource(
+                                if (transaction.paymentMethod == PaymentMethod.CARD) R.string.payment_method_card
+                                else R.string.payment_method_cash
+                            )
+                        ),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
 
-                Text(
-                    text = "${transaction.type.signSymbol}${transaction.amount}${transaction.currency.symbol}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(transaction.type.amountColorRes)
-                )
+                    Text(
+                        text = "${transaction.type.signSymbol}${transaction.amount}${transaction.currency.symbol}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(transaction.type.amountColorRes)
+                    )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
 
-                if (category != null) {
-                    CategoryChip(category)
+                    if (category != null) {
+                        CategoryChip(category)
+                    }
                 }
             }
         }
     }
-}

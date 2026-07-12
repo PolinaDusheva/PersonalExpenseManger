@@ -23,8 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
 import com.example.personalexpensemanager.ui.theme.GradientStart
@@ -49,7 +50,7 @@ fun PrimaryButton(
         if (isActive) GradientStart else Color.White, label = "textColor"
     )
 
-    val shape = RoundedCornerShape(70.dp)
+    val shape = RoundedCornerShape(dimensionResource(R.dimen.primary_button_corner_radius))
 
     Button(
         onClick = onClick,
@@ -65,7 +66,7 @@ fun PrimaryButton(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .border(
-                    width = 2.dp,
+                    width = dimensionResource(R.dimen.primary_button_border_width),
                     brush = GradientGraphics.primaryHorizontal,
                     shape = shape
                 )
@@ -80,7 +81,7 @@ fun PrimaryButton(
                     shape = shape
                 )
                 .clip(shape)
-                .padding(horizontal = 70.dp, vertical = 8.dp)
+                .padding(horizontal = dimensionResource(R.dimen.primary_button_padding_horizontal), vertical = dimensionResource(R.dimen.padding_small))
         ) {
             Text(
                 text = text,

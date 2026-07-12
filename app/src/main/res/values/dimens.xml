@@ -2,6 +2,7 @@
 <resources>
     <!-- Общи (layout-неутрални) -->
     <dimen name="padding_horizontal">20dp</dimen>
+    <dimen name="padding_big">32dp</dimen>
     <dimen name="padding_standard">16dp</dimen>
     <dimen name="padding_small">8dp</dimen>
 
@@ -36,6 +37,11 @@
     <dimen name="category_card_padding">12dp</dimen>
     <dimen name="category_card_icon_size">32dp</dimen>
     <dimen name="category_card_delete_icon_size">22dp</dimen>
+    <dimen name="category_card_elevation">8dp</dimen>
+    <dimen name="category_grid_spacing">12dp</dimen>
+
+    <!-- CategoryFormDialog -->
+    <dimen name="category_dialog_max_height">400dp</dimen>
 
     <!-- Headline -->
     <dimen name="headline_spacer">8dp</dimen>
@@ -64,13 +70,52 @@
     <dimen name="transaction_detail_avatar_icon_size">36dp</dimen>
     <dimen name="transaction_detail_badge_size">28dp</dimen>
     <dimen name="transaction_detail_badge_icon_size">16dp</dimen>
-    <dimen name="transaction_detail_header_height">280dp</dimen>
+    <dimen name="transaction_detail_header_height">320dp</dimen>
     <dimen name="transaction_detail_chip_padding_horizontal">12dp</dimen>
     <dimen name="transaction_detail_chip_padding_vertical">6dp</dimen>
     <dimen name="transaction_detail_chip_icon_size">18dp</dimen>
     <dimen name="transaction_detail_chip_icon_spacing">6dp</dimen>
-    <dimen name="transaction_detail_card_corner_radius">16dp</dimen>
+    <dimen name="transaction_detail_card_corner_radius">20dp</dimen>
     <dimen name="transaction_detail_card_padding">16dp</dimen>
     <dimen name="transaction_detail_card_row_spacing">10dp</dimen>
     <dimen name="add_expense_header_height">140dp</dimen>
+
+    <!-- Statistics cards -->
+    <dimen name="statistics_card_corner_radius">20dp</dimen>
+    <dimen name="statistics_card_elevation">4dp</dimen>
+    <dimen name="statistics_card_spacing">4dp</dimen>
+
+    <!-- Statistics charts -->
+    <dimen name="statistics_chart_corner_radius">24dp</dimen>
+    <dimen name="statistics_chart_padding">20dp</dimen>
+    <dimen name="line_chart_height">180dp</dimen>
+    <dimen name="bar_chart_height">200dp</dimen>
+    <dimen name="bar_chart_column_width">56dp</dimen>
+    <dimen name="bar_chart_bar_area_height">130dp</dimen>
+    <dimen name="bar_chart_bar_width">28dp</dimen>
+    <dimen name="bar_chart_bar_corner_radius">8dp</dimen>
+
+    <!-- TransactionFilterChip -->
+    <dimen name="filter_chip_corner_radius">50dp</dimen>
+    <dimen name="filter_chip_elevation">3dp</dimen>
+    <dimen name="filter_chip_border_width">1dp</dimen>
+
+    <!-- Transaction Details -->
+    <dimen name="transaction_detail_content_spacer">32dp</dimen>
+    <dimen name="transaction_detail_info_card_elevation">4dp</dimen>
+
+    <!-- Dashboard -->
+    <dimen name="dashboard_empty_card_height">320dp</dimen>
+
+    <!-- ErrorScreen -->
+    <dimen name="error_screen_button_spacer">24dp</dimen>
+
+    <!-- IconPickerGrid -->
+    <dimen name="icon_picker_grid_height">224dp</dimen>
+    <dimen name="icon_picker_icon_size">48dp</dimen>
+
+    <!-- PrimaryButton -->
+    <dimen name="primary_button_corner_radius">70dp</dimen>
+    <dimen name="primary_button_border_width">2dp</dimen>
+    <dimen name="primary_button_padding_horizontal">70dp</dimen>
 </resources>

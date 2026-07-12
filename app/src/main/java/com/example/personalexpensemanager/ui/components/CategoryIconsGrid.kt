@@ -16,7 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import com.example.personalexpensemanager.R
 
 @Composable
 fun IconPickerGrid(
@@ -26,16 +27,16 @@ fun IconPickerGrid(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(5),
-        modifier = modifier.height(56.dp * 4),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.height(dimensionResource(R.dimen.icon_picker_grid_height)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
         userScrollEnabled = false
     ) {
         items(categoryIconOptions) { iconName ->
             val isSelected = iconName == selectedIcon
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(dimensionResource(R.dimen.icon_picker_icon_size))
                     .clip(CircleShape)
                     .background(
                         if (isSelected) MaterialTheme.colorScheme.primary

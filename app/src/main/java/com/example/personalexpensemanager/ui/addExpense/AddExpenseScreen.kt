@@ -9,7 +9,8 @@ import com.example.personalexpensemanager.ui.components.ErrorScreen
 @Composable
 fun AddExpenseScreen(
     viewModel: AddExpenseViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateToCategories: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val formErrors by viewModel.formErrors.collectAsStateWithLifecycle()
@@ -40,7 +41,8 @@ fun AddExpenseScreen(
             onDescriptionTouched = viewModel::onDescriptionTouched,
             onDateSelected = viewModel::onDateSelected,
             onCategorySelected = viewModel::onCategorySelected,
-            onSave = viewModel::addExpense
+            onSave = viewModel::addExpense,
+            onNavigateToCategories = onNavigateToCategories
         )
     }
 }

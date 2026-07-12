@@ -14,8 +14,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
 
@@ -27,7 +28,7 @@ fun StatisticsCard(
     subtitle: String? = null,
     highlighted: Boolean = false
 ) {
-    val shape = RoundedCornerShape(20.dp)
+    val shape = RoundedCornerShape(dimensionResource(R.dimen.statistics_card_corner_radius))
     val background = if (highlighted) {
         Modifier.background(
             brush = Brush.linearGradient(listOf(GradientStart, GradientEnd)),
@@ -42,9 +43,9 @@ fun StatisticsCard(
 
     Column(
         modifier = modifier
-            .shadow(elevation = 4.dp, shape = shape)
+            .shadow(elevation = dimensionResource(R.dimen.statistics_card_elevation), shape = shape)
             .then(background)
-            .padding(16.dp)
+            .padding(dimensionResource(R.dimen.padding_standard))
     ) {
         Text(
             text = label,
@@ -52,7 +53,7 @@ fun StatisticsCard(
             color = labelColor,
             letterSpacing = 1.sp
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.statistics_card_spacing)))
         Text(
             text = value,
             style = MaterialTheme.typography.titleLarge,

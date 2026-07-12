@@ -33,7 +33,7 @@ fun bottomTabs() = listOf(
     BottomNavMenu(Screen.AddExpense, stringResource(R.string.nav_add), Icons.Filled.Add),
     //BottomNavMenu(Screen.Goals, stringResource(R.string.nav_goals), Icons.Filled.Radar),
     BottomNavMenu(Screen.Categories, stringResource(R.string.nav_categories), Icons.Filled.Category),
-    BottomNavMenu(Screen.Statistics, stringResource(R.string.statistics_title), Icons.Filled.StackedBarChart),
+    BottomNavMenu(Screen.Statistics, stringResource(R.string.nav_statistics), Icons.Filled.StackedBarChart),
 )
 
 @Composable

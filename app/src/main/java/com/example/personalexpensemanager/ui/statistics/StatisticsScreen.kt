@@ -23,9 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.components.ErrorScreen
@@ -56,87 +54,87 @@ fun StatisticsContent(
     onPeriodSelected: (Period) -> Unit = {},
     onRetry: () -> Unit = {}
 ) {
-    when (state) {
-        is IStatisticsUIState.Loading -> Box(
-            modifier = Modifier.fillMaxSize().background(Color.White)
-        ) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .statusBarsPadding()
+            .padding(top = dimensionResource(R.dimen.padding_small))
+    ) {
+        Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
+            Headline(text = stringResource(R.string.statistics_title))
         }
 
-        is IStatisticsUIState.Error -> Column(
-            modifier = Modifier.fillMaxSize().background(Color.White).statusBarsPadding()
-        ) {
-            ErrorScreen(messageResId = state.messageResId, onRetry = onRetry)
-        }
+        when (state) {
+            is IStatisticsUIState.Loading -> Box(Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
 
-        is IStatisticsUIState.Success -> Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.statistics),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.dashboard_header_height))
-                    .align(Alignment.TopCenter),
-                contentScale = ContentScale.Crop
+            is IStatisticsUIState.Error -> ErrorScreen(
+                messageResId = state.messageResId,
+                onRetry = onRetry
             )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .statusBarsPadding()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_standard))
-            ) {
-                Headline(text = stringResource(R.string.statistics_title))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
-                    StatisticsCard(
-                        label = stringResource(R.string.statistics_spent_this_month),
-                        value = formatAmount(state.currentMonthTotal),
-                        highlighted = true,
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatisticsCard(
-                        label = stringResource(R.string.statistics_period_total),
-                        value = formatAmount(state.periodTotal),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                PeriodFilter(
-                    selectedType = state.period.type,
-                    onPeriodSelected = onPeriodSelected
+            is IStatisticsUIState.Success -> Box(Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.statistics),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(dimensionResource(R.dimen.dashboard_header_height))
+                        .align(Alignment.TopCenter),
+                    contentScale = ContentScale.Crop
                 )
 
-                ExpenseLineChart(dailySpending = state.dailySpending)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_standard))
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
+                        StatisticsCard(
+                            label = stringResource(R.string.statistics_spent_this_month),
+                            value = formatAmount(state.currentMonthTotal),
+                            highlighted = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatisticsCard(
+                            label = stringResource(R.string.statistics_period_total),
+                            value = formatAmount(state.periodTotal),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
-                    StatisticsCard(
-                        label = stringResource(R.string.statistics_biggest_expense),
-                        value = state.biggestExpense?.amount?.let { formatAmount(it) } ?: "—",
-                        highlighted = true,
-                        modifier = Modifier.weight(1f)
+                    PeriodFilter(
+                        selectedType = state.period.type,
+                        onPeriodSelected = onPeriodSelected
                     )
-                    StatisticsCard(
-                        label = stringResource(R.string.statistics_avg_daily),
-                        value = formatAmount(state.averageDaily),
-                        modifier = Modifier.weight(1f)
-                    )
+
+                    ExpenseLineChart(dailySpending = state.dailySpending)
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
+                        StatisticsCard(
+                            label = stringResource(R.string.statistics_biggest_expense),
+                            value = state.biggestExpense?.amount?.let { formatAmount(it) } ?: "—",
+                            highlighted = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatisticsCard(
+                            label = stringResource(R.string.statistics_avg_daily),
+                            value = formatAmount(state.averageDaily),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    CategoryBarChart(categoryTotals = state.categoryTotals)
+
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
                 }
-
-                //Headline(text = stringResource(R.string.statistics_by_category))
-                CategoryBarChart(categoryTotals = state.categoryTotals)
-
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
             }
         }
     }
-
 }
 
 private fun formatAmount(amount: BigDecimal): String {

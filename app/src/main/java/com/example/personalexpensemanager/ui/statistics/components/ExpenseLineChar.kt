@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,9 +28,12 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.statistics.IStatisticsUIState.DailySpend
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
@@ -51,36 +55,34 @@ fun ExpenseLineChart(
         mutableIntStateOf(dailySpending.lastIndex)
     }
     val selected = dailySpending[selectedIndex]
-    val cardShape = RoundedCornerShape(24.dp)
+    val cardShape = RoundedCornerShape(dimensionResource(R.dimen.statistics_chart_corner_radius))
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 4.dp, shape = cardShape)
+            .shadow(elevation = dimensionResource(R.dimen.statistics_card_elevation), shape = cardShape)
             .background(Color.White, cardShape)
-            .padding(20.dp)
+            .padding(dimensionResource(R.dimen.statistics_chart_padding))
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = selected.date.format(DateTimeFormatter.ofPattern("d MMM")),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF6B7280)
-                )
-                if (selected.titles.isNotEmpty()) {
-                    Text(
-                        text = selected.titles.joinToString(", "),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF9CA3AF),
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = buildString {
+                    append(selected.date.format(DateTimeFormatter.ofPattern("d MMM")))
+                    if (selected.titles.isNotEmpty()) {
+                        append(" · ")
+                        append(selected.titles.joinToString(", "))
+                    }
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color(0xFF6B7280),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
             Text(
                 text = formatAmount(selected.amount),
                 style = MaterialTheme.typography.titleLarge,
@@ -89,12 +91,12 @@ fun ExpenseLineChart(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
 
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(180.dp)
+                .height(dimensionResource(R.dimen.line_chart_height))
                 .pointerInput(dailySpending) {
                     detectDragGestures(
                         onDragStart = { offset ->

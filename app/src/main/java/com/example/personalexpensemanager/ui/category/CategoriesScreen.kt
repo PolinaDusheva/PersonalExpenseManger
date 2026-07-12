@@ -37,7 +37,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
@@ -46,20 +45,11 @@ import com.example.personalexpensemanager.ui.components.CategoryFormDialog
 import com.example.personalexpensemanager.ui.components.DeleteConfirmDialog
 import com.example.personalexpensemanager.ui.components.ErrorScreen
 import com.example.personalexpensemanager.ui.components.Headline
+import com.example.personalexpensemanager.ui.theme.GradientEnd
+import com.example.personalexpensemanager.ui.theme.GradientStart
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
-private val cardGradients = listOf(
-    listOf(Color(0xFFFD1D1D), Color(0xFF6D28D9)),
-    listOf(Color(0xFFFCB045), Color(0xFFD859FF)),
-    listOf(Color(0xFF22C1C3), Color(0xFF275B96)),
-    listOf(Color(0xFF60A5FA), Color(0xFF983AB4)),
-    listOf(Color(0xFF3F5EFB), Color(0xFFFC466B)),
-    listOf(Color(0xFFFD1D1D), Color(0xFF6D28D9)),
-    listOf(Color(0xFF3FFBE5), Color(0xFFFC466B)),
-    listOf(Color(0xFF22C1C3), Color(0xFF275B96)),
-    listOf(Color(0xFF60A5FA), Color(0xFF983AB4)),
-    listOf(Color(0xFFC90057), Color(0xFF94E9D9))
-)
+private val cardGradients = listOf(GradientStart, GradientEnd)
 
 @Composable
 fun CategoriesScreen(viewModel: CategoriesViewModel) {
@@ -169,8 +159,8 @@ fun CategoriesContent(
                                     .fillMaxSize()
                                     .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
                                 contentPadding = PaddingValues(vertical = dimensionResource(R.dimen.padding_small)),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_grid_spacing)),
+                                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_grid_spacing))
                             ) {
                                 items(
                                     items = state.categories,
@@ -179,7 +169,7 @@ fun CategoriesContent(
                                     val index = state.categories.indexOf(category)
                                     CategoryCard(
                                         category = category,
-                                        gradient = cardGradients[index % cardGradients.size],
+                                        gradient = cardGradients,
                                         onClick = {
                                             onStartEditing(category)
                                             categoryToEdit = category

@@ -41,18 +41,16 @@ fun AppNavigation() {
 
     Scaffold(
         bottomBar = {
-            if (currentRoute in bottomTabs().map { it.screen.route }) {
-                BottomNavBar(
-                    currentRoute = currentRoute,
-                    onTabClick = { screen ->
-                        myNavigationManager.navigate(screen.route) {
-                            popUpTo(Screen.Dashboard.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+            BottomNavBar(
+                currentRoute = currentRoute,
+                onTabClick = { screen ->
+                    myNavigationManager.navigate(screen.route) {
+                        popUpTo(Screen.Dashboard.route) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                )
-            }
+                }
+            )
         }
     ) { innerPadding ->
         NavHost(
@@ -85,9 +83,7 @@ fun AppNavigation() {
             ) { entry ->
                 val id = entry.arguments?.getString("transactionId") ?: return@composable
                 val viewModel: TransactionDetailsViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { TransactionDetailsViewModel(factory.dataService, id) }
-                    }
+                    factory = factory.transactionDetailsFactory(id)
                 )
                 TransactionDetailsScreen(
                     viewModel = viewModel,
@@ -104,19 +100,30 @@ fun AppNavigation() {
                     onBack = { myNavigationManager.popBackStack() }
                 )
             }
+            composable(Screen.AddExpense.route) {
+                val viewModel: AddExpenseViewModel = viewModel(factory = factory)
+                AddExpenseScreen(
+                    viewModel = viewModel,
+                    onBack = { myNavigationManager.popBackStack() },
+                    onNavigateToCategories = {
+                        myNavigationManager.navigate(Screen.Categories.route)
+                    }
+                )
+            }
             composable(
                 Screen.EditTransaction.route,
                 arguments = listOf(navArgument("transactionId") { type = NavType.StringType })
             ) { entry ->
                 val transactionId = entry.arguments?.getString("transactionId") ?: return@composable
                 val viewModel: AddExpenseViewModel = viewModel(
-                    factory = viewModelFactory {
-                        initializer { AddExpenseViewModel(factory.dataService, transactionId) }
-                    }
+                    factory = factory.editTransactionFactory(transactionId)
                 )
                 AddExpenseScreen(
                     viewModel = viewModel,
-                    onBack = { myNavigationManager.popBackStack() }
+                    onBack = { myNavigationManager.popBackStack() },
+                    onNavigateToCategories = {
+                        myNavigationManager.navigate(Screen.Categories.route)
+                    }
                 )
             }
             composable(Screen.Categories.route) {

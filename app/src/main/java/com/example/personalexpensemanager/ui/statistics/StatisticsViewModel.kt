@@ -36,12 +36,14 @@ class StatisticsViewModel(
             dataService.categories,
             _selectedPeriod
         ) { transactions, categories, period ->
-            val expenses = TransactionCalculator.filterCurrentMonth(transactions)
-            val periodExpenses = filterByPeriod(expenses, period)
+            val allExpenses = filterExpenses(transactions)
+            val periodExpenses = filterByPeriod(allExpenses, period)
 
             IStatisticsUIState.Success(
-                currentMonthTotal = TransactionCalculator.calculateTotalExpenses(expenses),
-                periodTotal = TransactionCalculator.calculateTotalExpenses(periodExpenses),
+                currentMonthTotal = TransactionCalculator.calculateTotalExpenses(
+                    TransactionCalculator.filterCurrentMonth(transactions)
+                ),
+                periodTotal = calculateTotal(periodExpenses),
                 period = period,
                 dailySpending = calculateDailySpending(periodExpenses, period),
                 categoryTotals = calculateCategoryTotals(periodExpenses, categories),

@@ -1,23 +1,29 @@
 package com.example.personalexpensemanager.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.example.personalexpensemanager.domain.Category
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.personalexpensemanager.R
+import com.example.personalexpensemanager.domain.Category
+import com.example.personalexpensemanager.ui.theme.GradientEnd
+import com.example.personalexpensemanager.ui.theme.GradientStart
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
 @Composable
@@ -26,7 +32,7 @@ fun CategoryItem(
     categorySize: Float
 ) {
     val icon = categoryIconOutlined(category.iconName)
-    Column{
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -34,23 +40,35 @@ fun CategoryItem(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_row_icon_spacing)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = icon, contentDescription = category.name)
+            Icon(
+                imageVector = icon,
+                contentDescription = category.name,
+                tint = GradientStart
+            )
             Text(text = category.name)
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = "${(categorySize*100).toInt()}%")
+            Text(text = "${(categorySize * 100).toInt()}%")
         }
-        LinearProgressIndicator(
-            progress = categorySize,
-            strokeCap = StrokeCap.Round,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(dimensionResource(R.dimen.category_progress_height))
                 .padding(bottom = dimensionResource(R.dimen.padding_small))
-        )
-
+                .background(Color(0xFFE8E0F0), RoundedCornerShape(50))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(categorySize)
+                    .fillMaxHeight()
+                    .background(
+                        brush = Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
+                        shape = RoundedCornerShape(50)
+                    )
+            )
+        }
     }
-
 }
+
 @Preview(showBackground = true)
 @Composable
 fun CategoryItemPreview() {
@@ -61,3 +79,4 @@ fun CategoryItemPreview() {
         )
     }
 }
+

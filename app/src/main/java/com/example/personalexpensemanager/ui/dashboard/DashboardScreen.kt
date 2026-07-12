@@ -160,10 +160,10 @@ fun EmptyScreen(onRefresh: () -> Unit) {
                         modifier = Modifier
                             .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                             .fillMaxWidth()
-                            .height(320.dp),
+                            .height(dimensionResource(R.dimen.dashboard_empty_card_height)),
                         shape = RoundedCornerShape(dimensionResource(R.dimen.transaction_card_corner_radius)),
                         color = Color.White,
-                        shadowElevation = 4.dp
+                        shadowElevation = dimensionResource(R.dimen.transaction_card_elevation)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -262,6 +262,7 @@ fun SuccessScreen(
                                     title = stringResource(R.string.total_for_month),
                                     amount = totalAmount,
                                     currency = Currency.EUR,
+                                    highlighted = true,
                                     modifier = Modifier.weight(1f)
                                 )
                                 SummaryCard(
@@ -307,7 +308,7 @@ fun SuccessScreen(
                             .fillMaxWidth(),
                         shape = shape,
                         color = Color.White,
-                        shadowElevation = 4.dp
+                        shadowElevation = dimensionResource(R.dimen.transaction_card_elevation)
                     ) {
                         Column(
                             modifier = Modifier.padding(

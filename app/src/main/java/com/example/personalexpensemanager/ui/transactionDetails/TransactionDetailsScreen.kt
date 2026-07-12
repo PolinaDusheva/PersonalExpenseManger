@@ -1,5 +1,6 @@
 package com.example.personalexpensemanager.ui.transactionDetails
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
@@ -37,7 +40,12 @@ import com.example.personalexpensemanager.ui.components.appButtons.PrimaryButton
 import com.example.personalexpensemanager.ui.transactionDetails.components.TransactionDetailsHeader
 import com.example.personalexpensemanager.ui.transactionDetails.components.TransactionInfoCard
 import java.time.format.DateTimeFormatter
-
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.personalexpensemanager.domain.enums.Currency
+import com.example.personalexpensemanager.domain.enums.PaymentMethod
+import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
+import java.math.BigDecimal
+import java.time.LocalDate
 @Composable
 fun TransactionDetailsScreen(
     viewModel: TransactionDetailsViewModel,
@@ -104,93 +112,99 @@ fun TransactionDetailsContent(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            TransactionDetailsHeader(
-                transaction = transaction,
-                category = category,
-                onClose = onClose,
-                onShare = onShare
-            )
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
-
-            Column(
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.add_expense_backgound),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_standard))
-            ) {
-                TransactionInfoCard(
-                    rows = listOf(
-                        stringResource(R.string.transaction_detail_date) to transaction.date.format(
-                            DateTimeFormatter.ofPattern(stringResource(R.string.date_format_pattern))
-                        ),
-                        stringResource(R.string.transaction_detail_type) to stringResource(
-                            when (transaction.type) {
-                                TransactionType.EXPENSE -> R.string.transaction_type_expense
-                                TransactionType.INCOME -> R.string.transaction_type_income
-                                TransactionType.TRANSFER -> R.string.transaction_type_transfer
-                            }
+                    .align(Alignment.BottomCenter),
+                contentScale = ContentScale.FillWidth
+            )
+
+            Column(modifier = Modifier.fillMaxSize()) {
+                TransactionDetailsHeader(
+                    transaction = transaction,
+                    category = category,
+                    onClose = onClose,
+                    onDelete = { showDeleteDialog = true }
+                )
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.transaction_detail_content_spacer)))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_standard))
+                ) {
+                    TransactionInfoCard(
+                        rows = listOf(
+                            stringResource(R.string.transaction_detail_date) to transaction.date.format(
+                                DateTimeFormatter.ofPattern(stringResource(R.string.date_format_pattern))
+                            ),
+                            stringResource(R.string.transaction_detail_type) to stringResource(
+                                when (transaction.type) {
+                                    TransactionType.EXPENSE -> R.string.transaction_type_expense
+                                    TransactionType.INCOME -> R.string.transaction_type_income
+                                    TransactionType.TRANSFER -> R.string.transaction_type_transfer
+                                }
+                            )
                         )
                     )
-                )
 
-                TransactionInfoCard(
-                    rows = buildList {
-                        add(stringResource(R.string.transaction_detail_narration) to transaction.title)
-                        add(stringResource(R.string.transaction_detail_description) to transaction.description)
-                        if (transaction.type == TransactionType.TRANSFER && goal != null) {
-                            add(stringResource(R.string.transaction_detail_goal) to goal.title)
-                        } else if (category != null) {
-                            add(stringResource(R.string.transaction_detail_category) to category.name)
+                    TransactionInfoCard(
+                        rows = buildList {
+                            add(stringResource(R.string.transaction_detail_narration) to transaction.title)
+                            add(stringResource(R.string.transaction_detail_description) to transaction.description)
+                            if (transaction.type == TransactionType.TRANSFER && goal != null) {
+                                add(stringResource(R.string.transaction_detail_goal) to goal.title)
+                            } else if (category != null) {
+                                add(stringResource(R.string.transaction_detail_category) to category.name)
+                            }
                         }
-                    }
-                )
-            }
+                    )
+                }
 
-            Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
 
-            Column(
-                modifier = Modifier
-                    .width(IntrinsicSize.Max)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-            ) {
                 PrimaryButton(
                     text = stringResource(R.string.transaction_detail_edit),
                     onClick = onEdit,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                PrimaryButton(
-                    text = stringResource(R.string.transaction_detail_delete),
-                    onClick = { showDeleteDialog = true },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                 )
             }
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
         }
     }
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.delete_confirm_title)) },
-            text = { Text(stringResource(R.string.transaction_delete_confirm_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDeleteDialog = false
-                    onDelete()
-                }) {
-                    Text(stringResource(R.string.category_delete))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.category_cancel))
-                }
-            }
+}
+@Preview(showBackground = true)
+@Composable
+fun TransactionDetailsPreview() {
+    PersonalExpenseManagerTheme {
+        TransactionDetailsContent(
+            transaction = Transaction(
+                id = "1",
+                title = "Grocery shopping",
+                amount = BigDecimal("87.50"),
+                date = LocalDate.of(2026, 7, 10),
+                currency = Currency.EUR,
+                type = TransactionType.EXPENSE,
+                categoryId = "cat1",
+                description = "Weekly groceries from Lidl",
+                paymentMethod = PaymentMethod.CARD
+            ),
+            category = Category(
+                id = "cat1",
+                name = "Food",
+                iconName = "🛒"
+            ),
+            goal = null,
+            onClose = {},
+            onEdit = {},
+            onDelete = {},
+            onShare = {}
         )
     }
 }

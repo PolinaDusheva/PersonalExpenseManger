@@ -21,9 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.statistics.IStatisticsUIState.CategorySpend
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
@@ -39,16 +41,16 @@ fun CategoryBarChart(
     if (categoryTotals.isEmpty()) return
 
     val maxAmount = categoryTotals.maxOf { it.amount }.toFloat().coerceAtLeast(1f)
-    val cardShape = RoundedCornerShape(24.dp)
+    val cardShape = RoundedCornerShape(dimensionResource(R.dimen.statistics_chart_corner_radius))
     val barBrush = Brush.verticalGradient(listOf(GradientEnd, GradientStart))
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 4.dp, shape = cardShape)
+            .shadow(elevation = dimensionResource(R.dimen.statistics_card_elevation), shape = cardShape)
             .background(Color.White, cardShape)
-            .padding(20.dp)
-            .height(200.dp),
+            .padding(dimensionResource(R.dimen.statistics_chart_padding))
+            .height(dimensionResource(R.dimen.bar_chart_height)),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.Bottom
     ) {
@@ -56,32 +58,35 @@ fun CategoryBarChart(
             val fraction = category.amount.toFloat() / maxAmount
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.width(56.dp)
+                modifier = Modifier.width(dimensionResource(R.dimen.bar_chart_column_width))
             ) {
                 Text(
                     text = formatShort(category.amount),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color(0xFF6B7280)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.statistics_card_spacing)))
                 Column(
                     modifier = Modifier
-                        .height(130.dp)
+                        .height(dimensionResource(R.dimen.bar_chart_bar_area_height))
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.Bottom,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(
                         modifier = Modifier
-                            .width(28.dp)
+                            .width(dimensionResource(R.dimen.bar_chart_bar_width))
                             .height((130 * fraction).dp.coerceAtLeast(4.dp))
                             .background(
                                 brush = barBrush,
-                                shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+                                shape = RoundedCornerShape(
+                                    topStart = dimensionResource(R.dimen.bar_chart_bar_corner_radius),
+                                    topEnd = dimensionResource(R.dimen.bar_chart_bar_corner_radius)
+                                )
                             )
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 Text(
                     text = category.categoryName,
                     style = MaterialTheme.typography.labelMedium,
