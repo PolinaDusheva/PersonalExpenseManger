@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -40,11 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
+import com.example.personalexpensemanager.ui.components.AppSnackbarHost
 import com.example.personalexpensemanager.ui.components.CategoryCard
 import com.example.personalexpensemanager.ui.components.CategoryFormDialog
 import com.example.personalexpensemanager.ui.components.DeleteConfirmDialog
 import com.example.personalexpensemanager.ui.components.ErrorScreen
 import com.example.personalexpensemanager.ui.components.Headline
+import com.example.personalexpensemanager.ui.components.appButtons.GradientIconButton
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
@@ -52,7 +56,10 @@ import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 private val cardGradients = listOf(GradientStart, GradientEnd)
 
 @Composable
-fun CategoriesScreen(viewModel: CategoriesViewModel) {
+fun CategoriesScreen(
+    viewModel: CategoriesViewModel,
+    onCategoryAdded: (() -> Unit)? = null
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val formErrors by viewModel.formErrors.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -76,7 +83,8 @@ fun CategoriesScreen(viewModel: CategoriesViewModel) {
         onNameFieldTouched = viewModel::onNameFieldTouched,
         onIconSelected = viewModel::onIconSelected,
         onIconTouched = viewModel::onIconTouched,
-        onStartEditing = viewModel::startEditing
+        onStartEditing = viewModel::startEditing,
+        onCategoryAdded = onCategoryAdded
     )
 }
 
@@ -94,23 +102,16 @@ fun CategoriesContent(
     onNameFieldTouched: () -> Unit,
     onIconSelected: (String) -> Unit,
     onIconTouched: () -> Unit,
-    onStartEditing: (Category?) -> Unit
-) {
+    onStartEditing: (Category?) -> Unit,
+    onCategoryAdded: (() -> Unit)? = null
+){
     var showAddDialog by remember { mutableStateOf(false) }
     var categoryToEdit by remember { mutableStateOf<Category?>(null) }
     var categoryToDelete by remember { mutableStateOf<Category?>(null) }
 
     Scaffold(
         containerColor = Color.White,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                onStartEditing(null)
-                showAddDialog = true
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.categories_add_description))
-            }
-        }
+        snackbarHost = { AppSnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -131,8 +132,24 @@ fun CategoriesContent(
                     .fillMaxSize()
                     .padding(top = dimensionResource(R.dimen.padding_small))
             ) {
-                Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
-                    Headline(text = stringResource(R.string.categories_title))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Headline(text = stringResource(R.string.categories_title))
+                    }
+                    GradientIconButton(
+                        icon = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.categories_add_description),
+                        onClick = {
+                            onStartEditing(null)
+                            showAddDialog = true
+                        }
+                    )
                 }
                 Box(modifier = Modifier.fillMaxSize()) {
                     when (state) {
@@ -196,7 +213,11 @@ fun CategoriesContent(
             onNameFieldTouched = onNameFieldTouched,
             onIconSelected = onIconSelected,
             onIconTouched = onIconTouched,
-            onConfirm = { name, icon -> onAdd(name, icon); showAddDialog = false },
+            onConfirm = { name, icon ->
+                onAdd(name, icon)
+                showAddDialog = false
+                onCategoryAdded?.invoke()
+            },
             onDismiss = { showAddDialog = false }
         )
     }

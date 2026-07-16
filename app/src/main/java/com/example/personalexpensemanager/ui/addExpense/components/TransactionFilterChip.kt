@@ -1,4 +1,4 @@
-package com.example.personalexpensemanager.ui.components
+package com.example.personalexpensemanager.ui.addExpense.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,11 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
 @Composable
@@ -41,7 +37,7 @@ fun TransactionFilterChip(
                         .background(brush = GradientGraphics.primaryHorizontal, shape = shape)
                 } else {
                     Modifier
-                        .shadow(elevation = dimensionResource(R.dimen.filter_chip_elevation), shape = shape)
+                        .shadow(elevation = dimensionResource(R.dimen.elevation), shape = shape)
                         .background(Color.White, shape)
                         .border(width = dimensionResource(R.dimen.filter_chip_border_width), brush = GradientGraphics.primaryHorizontal, shape = shape)
                 }

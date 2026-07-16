@@ -38,6 +38,7 @@ import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.domain.enums.amountColorRes
 import com.example.personalexpensemanager.domain.enums.signSymbol
 import com.example.personalexpensemanager.domain.enums.symbol
+import com.example.personalexpensemanager.ui.components.appButtons.GradientIconButton
 
 @Composable
 fun TransactionDetailsHeader(
@@ -66,19 +67,23 @@ fun TransactionDetailsHeader(
                         .padding(dimensionResource(R.dimen.padding_horizontal)),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = onClose, modifier = Modifier.background(Color.White, CircleShape)) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.action_close))
-                    }
-                    IconButton(onClick = onDelete, modifier = Modifier.background(Color.White, CircleShape)) {
-                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.transaction_detail_delete))
-                    }
+                    GradientIconButton(
+                        icon = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.action_close),
+                        onClick = onClose
+                    )
+                    GradientIconButton(
+                        icon = Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.transaction_detail_delete),
+                        onClick = onDelete
+                    )
                 }
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    TransactionAvatar(transaction)
+                    TransactionAvatar(transaction, category)
 
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
 

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Goal
+import com.example.personalexpensemanager.ui.addExpense.components.TransactionFilterChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +27,8 @@ fun GoalDropdown(
     selectedGoal: Goal?,
     onGoalSelected: (Goal?) -> Unit,
     placeholder: String = stringResource(R.string.goal_dropdown_placeholder),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onChipClicked: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     val label = selectedGoal?.title ?: placeholder
@@ -35,7 +37,9 @@ fun GoalDropdown(
         TransactionFilterChip(
             text = label,
             selected = selectedGoal != null,
-            onClick = { expanded = true },
+            onClick = {
+                if (onChipClicked != null) onChipClicked() else expanded = true
+            },
             trailingIcon = {
                 Icon(
                     Icons.Filled.ArrowDropDown,

@@ -5,6 +5,7 @@
     <dimen name="padding_big">32dp</dimen>
     <dimen name="padding_standard">16dp</dimen>
     <dimen name="padding_small">8dp</dimen>
+    <dimen name="elevation">4dp</dimen>
 
     <!-- Dashboard -->
     <dimen name="dashboard_header_height">210dp</dimen>
@@ -19,17 +20,18 @@
     <dimen name="summary_card_padding_bottom">20dp</dimen>
     <dimen name="summary_card_rounded_corners">20dp</dimen>
     <dimen name="summary_card_content_spacing">8dp</dimen>
-    <dimen name="summary_card_elevation">4dp</dimen>
+
 
     <!-- Transaction row (TransactionItem) -->
     <dimen name="transaction_row_vertical_padding">10dp</dimen>
     <dimen name="transaction_icon_circle_size">44dp</dimen>
     <dimen name="transaction_icon_text_spacing">12dp</dimen>
     <dimen name="transaction_card_corner_radius">20dp</dimen>
-    <dimen name="transaction_card_elevation">4dp</dimen>
+    <dimen name="transaction_icon_border_width">2dp</dimen>
 
     <!-- CategoryItem (Dashboard progress row) -->
     <dimen name="category_row_icon_spacing">8dp</dimen>
+    <dimen name="category_item_icon_circle_size">32dp</dimen>
     <dimen name="category_progress_height">10dp</dimen>
 
     <!-- CategoryCard (grid) -->
@@ -37,7 +39,6 @@
     <dimen name="category_card_padding">12dp</dimen>
     <dimen name="category_card_icon_size">32dp</dimen>
     <dimen name="category_card_delete_icon_size">22dp</dimen>
-    <dimen name="category_card_elevation">8dp</dimen>
     <dimen name="category_grid_spacing">12dp</dimen>
 
     <!-- CategoryFormDialog -->
@@ -55,13 +56,11 @@
 
     <!-- AddExpense form fields -->
     <dimen name="add_expense_field_corner_radius">50dp</dimen>
-    <dimen name="add_expense_field_elevation">3dp</dimen>
     <dimen name="add_expense_field_border_width">1dp</dimen>
 
     <!-- AddExpense radio rows (payment method / transaction type) -->
     <dimen name="add_expense_radio_row_padding">4dp</dimen>
     <dimen name="add_expense_radio_circle_size">20dp</dimen>
-    <dimen name="add_expense_radio_circle_elevation">2dp</dimen>
     <dimen name="add_expense_radio_circle_border_width">2dp</dimen>
     <dimen name="add_expense_radio_circle_padding">4dp</dimen>
     <dimen name="add_expense_radio_label_spacing">8dp</dimen>
@@ -82,7 +81,6 @@
 
     <!-- Statistics cards -->
     <dimen name="statistics_card_corner_radius">20dp</dimen>
-    <dimen name="statistics_card_elevation">4dp</dimen>
     <dimen name="statistics_card_spacing">4dp</dimen>
 
     <!-- Statistics charts -->
@@ -97,12 +95,10 @@
 
     <!-- TransactionFilterChip -->
     <dimen name="filter_chip_corner_radius">50dp</dimen>
-    <dimen name="filter_chip_elevation">3dp</dimen>
     <dimen name="filter_chip_border_width">1dp</dimen>
 
     <!-- Transaction Details -->
     <dimen name="transaction_detail_content_spacer">32dp</dimen>
-    <dimen name="transaction_detail_info_card_elevation">4dp</dimen>
 
     <!-- Dashboard -->
     <dimen name="dashboard_empty_card_height">320dp</dimen>
@@ -118,4 +114,11 @@
     <dimen name="primary_button_corner_radius">70dp</dimen>
     <dimen name="primary_button_border_width">2dp</dimen>
     <dimen name="primary_button_padding_horizontal">70dp</dimen>
+
+    <!-- Dialog buttons -->
+    <dimen name="dialog_button_padding_horizontal">20dp</dimen>
+
+    <!-- MonthlyExpenseArc -->
+    <dimen name="arc_stroke_width">18dp</dimen>
+    <dimen name="arc_label_letter_spacing">2sp</dimen>
 </resources>

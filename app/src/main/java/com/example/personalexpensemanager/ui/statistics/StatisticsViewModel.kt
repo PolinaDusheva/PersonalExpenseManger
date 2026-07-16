@@ -6,7 +6,7 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.IExpenseDataService
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Transaction
-import com.example.personalexpensemanager.domain.TransactionCalculator
+import com.example.personalexpensemanager.domain.TransactionHelper
 import com.example.personalexpensemanager.domain.enums.TransactionType
 import com.example.personalexpensemanager.ui.statistics.components.Period
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,8 +40,8 @@ class StatisticsViewModel(
             val periodExpenses = filterByPeriod(allExpenses, period)
 
             IStatisticsUIState.Success(
-                currentMonthTotal = TransactionCalculator.calculateTotalExpenses(
-                    TransactionCalculator.filterCurrentMonth(transactions)
+                currentMonthTotal = TransactionHelper.calculateTotalExpenses(
+                    TransactionHelper.filterCurrentMonth(transactions)
                 ),
                 periodTotal = calculateTotal(periodExpenses),
                 period = period,

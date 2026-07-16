@@ -50,8 +50,11 @@ fun DashboardScreen(
     onTransactionClick: (String) -> Unit = {}
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing = viewModel.isRefreshing.collectAsStateWithLifecycle()
+
     DashboardContent(
         state.value,
+        isRefreshing = isRefreshing.value,
         onRefresh = viewModel::refresh,
         onRetry = viewModel::retry,
         onTransactionClick = onTransactionClick
@@ -61,6 +64,7 @@ fun DashboardScreen(
 @Composable
 fun DashboardContent(
     state: IDashboardUIState,
+    isRefreshing: Boolean = false,
     onRefresh: () -> Unit = {},
     onRetry: () -> Unit = {},
     onTransactionClick: (String) -> Unit = {}
@@ -70,12 +74,14 @@ fun DashboardContent(
         is IDashboardUIState.Success -> SuccessScreen(
             transactions = state.transactions,
             categoriesMap = state.categoriesMap,
+            categoriesById = state.categoriesById,
             totalAmount = state.totalAmount,
             biggestExpense = state.biggestExpense,
+            isRefreshing = isRefreshing,
             onRefresh = onRefresh,
             onTransactionClick = onTransactionClick
         )
-        is IDashboardUIState.Empty -> EmptyScreen(onRefresh = onRefresh)
+        is IDashboardUIState.Empty -> EmptyScreen(isRefreshing = isRefreshing, onRefresh = onRefresh)
         is IDashboardUIState.Error -> ErrorScreen(
             messageResId = state.messageResId,
             onRetry = onRetry
@@ -84,9 +90,12 @@ fun DashboardContent(
 }
 
 @Composable
-fun EmptyScreen(onRefresh: () -> Unit) {
+fun EmptyScreen(
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit
+) {
     PullToRefreshBox(
-        isRefreshing = false,
+        isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize()
     ) {
@@ -163,7 +172,7 @@ fun EmptyScreen(onRefresh: () -> Unit) {
                             .height(dimensionResource(R.dimen.dashboard_empty_card_height)),
                         shape = RoundedCornerShape(dimensionResource(R.dimen.transaction_card_corner_radius)),
                         color = Color.White,
-                        shadowElevation = dimensionResource(R.dimen.transaction_card_elevation)
+                        shadowElevation = dimensionResource(R.dimen.elevation)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -213,13 +222,16 @@ fun EmptyScreen(onRefresh: () -> Unit) {
 fun SuccessScreen(
     transactions: List<Transaction>,
     categoriesMap: HashMap<Category, Float>,
+    categoriesById: Map<String, Category>,
     totalAmount: BigDecimal,
     biggestExpense: BigDecimal,
+    isRefreshing: Boolean = false,
     onRefresh: () -> Unit,
     onTransactionClick: (String) -> Unit = {}
 ) {
+    val currency = transactions.firstOrNull()?.currency ?: Currency.EUR
     PullToRefreshBox(
-        isRefreshing = false,
+        isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize()
     ) {
@@ -261,14 +273,14 @@ fun SuccessScreen(
                                 SummaryCard(
                                     title = stringResource(R.string.total_for_month),
                                     amount = totalAmount,
-                                    currency = Currency.EUR,
+                                    currency = currency,
                                     highlighted = true,
                                     modifier = Modifier.weight(1f)
                                 )
                                 SummaryCard(
                                     title = stringResource(R.string.biggest_expense),
                                     amount = biggestExpense,
-                                    currency = Currency.EUR,
+                                    currency = currency,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
@@ -308,14 +320,17 @@ fun SuccessScreen(
                             .fillMaxWidth(),
                         shape = shape,
                         color = Color.White,
-                        shadowElevation = dimensionResource(R.dimen.transaction_card_elevation)
+                        shadowElevation = dimensionResource(R.dimen.elevation)
                     ) {
                         Column(
                             modifier = Modifier.padding(
                                 horizontal = dimensionResource(R.dimen.padding_standard),
                             )
                         ) {
-                            TransactionItem(transaction)
+                            TransactionItem(
+                                transaction = transaction,
+                                category = categoriesById[transaction.categoryId]
+                            )
                         }
                     }
                 }
@@ -334,18 +349,43 @@ fun SuccessScreen(
                 }
 
                 val categoriesEntries = categoriesMap.entries.toList()
-                items(
-                    items = categoriesEntries,
-                    key = { "category_${it.key.id}" }
-                ) { categoryEntry ->
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
-                    ) {
-                        CategoryItem(
-                            category = categoryEntry.key,
-                            categorySize = categoryEntry.value
-                        )
+                if (categoriesEntries.isEmpty()) {
+                    item {
+                        Surface(
+                            modifier = Modifier
+                                .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                                .fillMaxWidth()
+                                .height(dimensionResource(R.dimen.dashboard_empty_card_height)),
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.transaction_card_corner_radius)),
+                            color = Color.White,
+                            shadowElevation = dimensionResource(R.dimen.elevation)
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.dashboard_no_categories),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    items(
+                        items = categoriesEntries,
+                        key = { "category_${it.key.id}" }
+                    ) { categoryEntry ->
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
+                        ) {
+                            CategoryItem(
+                                category = categoryEntry.key,
+                                categorySize = categoryEntry.value
+                            )
+                        }
                     }
                 }
             }
@@ -366,6 +406,10 @@ fun DashboardPreview() {
                 categoriesMap = hashMapOf(
                     Category("1", "food", "Храна") to 0.6f,
                     Category("2", "transport", "Транспорт") to 0.4f
+                ),
+                categoriesById = mapOf(
+                    "1" to Category("1", "food", "Храна"),
+                    "2" to Category("2", "transport", "Транспорт")
                 ),
                 totalAmount = BigDecimal("150.00"),
                 biggestExpense = BigDecimal("150.00")

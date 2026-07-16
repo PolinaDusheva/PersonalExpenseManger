@@ -31,9 +31,9 @@ fun bottomTabs() = listOf(
     BottomNavMenu(Screen.Dashboard, stringResource(R.string.nav_home), Icons.Filled.Home),
     BottomNavMenu(Screen.Transactions, stringResource(R.string.nav_payments), Icons.Filled.Payments),
     BottomNavMenu(Screen.AddExpense, stringResource(R.string.nav_add), Icons.Filled.Add),
-    //BottomNavMenu(Screen.Goals, stringResource(R.string.nav_goals), Icons.Filled.Radar),
+    BottomNavMenu(Screen.Goals, stringResource(R.string.nav_goals), Icons.Filled.Radar),
     BottomNavMenu(Screen.Categories, stringResource(R.string.nav_categories), Icons.Filled.Category),
-    BottomNavMenu(Screen.Statistics, stringResource(R.string.nav_statistics), Icons.Filled.StackedBarChart),
+    //BottomNavMenu(Screen.Statistics, stringResource(R.string.nav_statistics), Icons.Filled.StackedBarChart),
 )
 
 @Composable
@@ -44,7 +44,7 @@ fun BottomNavBar(
     NavigationBar {
         bottomTabs().forEach { tab ->
             NavigationBarItem(
-                selected = currentRoute == tab.screen.route,
+                selected = currentRoute?.substringBefore("?") == tab.screen.route,
                 onClick = { onTabClick(tab.screen) },
                 icon = { Icon(tab.icon, contentDescription = tab.label) },
                 label = { Text(tab.label) }

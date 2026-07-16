@@ -10,6 +10,7 @@ import com.example.personalexpensemanager.ui.addExpense.AddExpenseViewModel
 import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
 import com.example.personalexpensemanager.ui.category.CategoriesViewModel
+import com.example.personalexpensemanager.ui.goals.GoalsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,6 +27,7 @@ class AppViewModelFactory(
         categoryDao = database.categoryDao(),
         transactionDao = database.transactionDao(),
         goalDao = database.goalDao(),
+        budgetDao = database.budgetDao(),
         scope = applicationScope
     )
 
@@ -42,6 +44,8 @@ class AppViewModelFactory(
                 CategoriesViewModel(dataService = dataService) as T
             modelClass.isAssignableFrom(StatisticsViewModel::class.java) ->
                 StatisticsViewModel(dataService = dataService) as T
+            modelClass.isAssignableFrom(GoalsViewModel::class.java) ->
+                GoalsViewModel(dataService) as T
             else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
         }
     }

@@ -25,13 +25,17 @@ import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
-
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.graphicsLayer
+import com.example.personalexpensemanager.ui.theme.GradientGraphics
 @Composable
 fun CategoryItem(
     category: Category,
     categorySize: Float
 ) {
     val icon = categoryIconOutlined(category.iconName)
+    val iconBrush = GradientGraphics.primaryHorizontal
     Column {
         Row(
             modifier = Modifier
@@ -43,7 +47,15 @@ fun CategoryItem(
             Icon(
                 imageVector = icon,
                 contentDescription = category.name,
-                tint = GradientStart
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .graphicsLayer(alpha = 0.99f)
+                    .drawWithCache {
+                        onDrawWithContent {
+                            drawContent()
+                            drawRect(brush = iconBrush, blendMode = BlendMode.SrcAtop)
+                        }
+                    }
             )
             Text(text = category.name)
             Spacer(modifier = Modifier.weight(1f))

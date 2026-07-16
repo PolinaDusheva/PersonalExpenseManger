@@ -4,11 +4,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.example.personalexpensemanager.R
-import com.example.personalexpensemanager.ui.components.TransactionFilterChip
+import com.example.personalexpensemanager.ui.addExpense.components.TransactionFilterChip
+import com.example.personalexpensemanager.ui.components.AppDatePickerDialog
+import com.example.personalexpensemanager.ui.components.appDatePickerColors
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -61,34 +60,28 @@ fun PeriodFilter(
 
     if (showRangePicker) {
         val rangeState = rememberDateRangePickerState()
-        DatePickerDialog(
+        AppDatePickerDialog(
             onDismissRequest = { showRangePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val startMillis = rangeState.selectedStartDateMillis
-                        val endMillis = rangeState.selectedEndDateMillis
-                        if (startMillis != null && endMillis != null) {
-                            onPeriodSelected(
-                                Period.custom(
-                                    start = millisToDate(startMillis),
-                                    end = millisToDate(endMillis)
-                                )
-                            )
-                        }
-                        showRangePicker = false
-                    }
-                ) { Text(stringResource(R.string.period_picker_confirm)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showRangePicker = false }) {
-                    Text(stringResource(R.string.category_cancel))
+            onConfirm = {
+                val startMillis = rangeState.selectedStartDateMillis
+                val endMillis = rangeState.selectedEndDateMillis
+                if (startMillis != null && endMillis != null) {
+                    onPeriodSelected(
+                        Period.custom(
+                            start = millisToDate(startMillis),
+                            end = millisToDate(endMillis)
+                        )
+                    )
                 }
-            }
+                showRangePicker = false
+            },
+            confirmText = stringResource(R.string.action_ok),
+            dismissText = stringResource(R.string.action_cancel)
         ) {
             DateRangePicker(
                 state = rangeState,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = appDatePickerColors()
             )
         }
     }

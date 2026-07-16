@@ -24,6 +24,8 @@ import com.example.personalexpensemanager.ui.category.CategoriesScreen
 import com.example.personalexpensemanager.ui.category.CategoriesViewModel
 import com.example.personalexpensemanager.ui.dashboard.DashboardScreen
 import com.example.personalexpensemanager.ui.dashboard.DashboardViewModel
+import com.example.personalexpensemanager.ui.goals.GoalsScreen
+import com.example.personalexpensemanager.ui.goals.GoalsViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionViewModel
 import com.example.personalexpensemanager.ui.transaction.TransactionsScreen
 import com.example.personalexpensemanager.ui.transactionDetails.TransactionDetailsScreen
@@ -74,6 +76,9 @@ fun AppNavigation() {
                     onBack = { myNavigationManager.popBackStack() },
                     onTransactionClick = { id ->
                         myNavigationManager.navigate(Screen.TransactionDetail.createRoute(id))
+                    },
+                    onStatisticsClick = {
+                        myNavigationManager.navigate(Screen.Statistics.route)
                     }
                 )
             }
@@ -97,16 +102,12 @@ fun AppNavigation() {
                 val viewModel: AddExpenseViewModel = viewModel(factory = factory)
                 AddExpenseScreen(
                     viewModel = viewModel,
-                    onBack = { myNavigationManager.popBackStack() }
-                )
-            }
-            composable(Screen.AddExpense.route) {
-                val viewModel: AddExpenseViewModel = viewModel(factory = factory)
-                AddExpenseScreen(
-                    viewModel = viewModel,
                     onBack = { myNavigationManager.popBackStack() },
                     onNavigateToCategories = {
-                        myNavigationManager.navigate(Screen.Categories.route)
+                        myNavigationManager.navigate(Screen.Categories.createRoute(true))
+                    },
+                    onNavigateToGoals = {
+                        myNavigationManager.navigate(Screen.Goals.createRoute(true))
                     }
                 )
             }
@@ -126,9 +127,37 @@ fun AppNavigation() {
                     }
                 )
             }
-            composable(Screen.Categories.route) {
+            composable(
+                route = Screen.Categories.routeWithArgs,
+                arguments = listOf(navArgument(Screen.Categories.ARG_RETURN) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                })
+            ) { entry ->
+                val returnAfterAdd = entry.arguments?.getBoolean(Screen.Categories.ARG_RETURN) ?: false
                 val viewModel: CategoriesViewModel = viewModel(factory = factory)
-                CategoriesScreen(viewModel = viewModel)
+                CategoriesScreen(
+                    viewModel = viewModel,
+                    onCategoryAdded = if (returnAfterAdd) {
+                        { myNavigationManager.popBackStack() }
+                    } else null
+                )
+            }
+            composable(
+                route = Screen.Goals.routeWithArgs,
+                arguments = listOf(navArgument(Screen.Goals.ARG_RETURN) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                })
+            ) { entry ->
+                val returnAfterAdd = entry.arguments?.getBoolean(Screen.Goals.ARG_RETURN) ?: false
+                val viewModel: GoalsViewModel = viewModel(factory = factory)
+                GoalsScreen(
+                    viewModel = viewModel,
+                    onGoalAdded = if (returnAfterAdd) {
+                        { myNavigationManager.popBackStack() }
+                    } else null
+                )
             }
             composable(Screen.Statistics.route) {
                 val viewModel: StatisticsViewModel = viewModel(factory = factory)

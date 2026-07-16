@@ -57,9 +57,30 @@ class FakeIExpenseDataService: IExpenseDataService {
     )
     override val goals: StateFlow<List<Goal>> = _goals.asStateFlow()
 
+    private val _monthlyBudget = MutableStateFlow<BigDecimal?>(null)
+
+    override val monthlyBudget: StateFlow<BigDecimal?> = _monthlyBudget.asStateFlow()
+
+
+    override suspend fun setMonthlyBudget(amount: BigDecimal) {
+        _monthlyBudget.value = amount
+    }
+
+    override val dailyLimit: StateFlow<BigDecimal?>
+        get() = TODO("Not yet implemented")
+
+    override suspend fun setDailyLimit(amount: BigDecimal) {
+        TODO("Not yet implemented")
+    }
+
+
     override suspend fun getTransactions(): List<Transaction> {
         delay(1000)
         return _transactions.value
+    }
+
+    override suspend fun getTransactionsOrderedByDate(): List<Transaction> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getCategories(): List<Category> {

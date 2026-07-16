@@ -4,7 +4,7 @@ import com.example.personalexpensemanager.domain.enums.TransactionType
 import java.math.BigDecimal
 import java.time.LocalDate
 
-object TransactionCalculator {
+object TransactionHelper {
 
     fun filterCurrentMonth(transactions: List<Transaction>): List<Transaction> {
         val now = LocalDate.now()

@@ -1,7 +1,9 @@
 package com.example.personalexpensemanager.data
+import com.example.personalexpensemanager.data.local.dao.BudgetDao
 import com.example.personalexpensemanager.data.local.dao.CategoryDao
 import com.example.personalexpensemanager.data.local.dao.GoalDao
 import com.example.personalexpensemanager.data.local.dao.TransactionDao
+import com.example.personalexpensemanager.data.local.entity.BudgetEntity
 import com.example.personalexpensemanager.data.local.entity.toDomain
 import com.example.personalexpensemanager.data.local.entity.toEntity
 import com.example.personalexpensemanager.domain.Category
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.math.BigDecimal
 import kotlin.random.Random
 
 
@@ -19,6 +22,7 @@ class RoomExpenseDataService (
     private val categoryDao: CategoryDao,
     private val transactionDao: TransactionDao,
     private val goalDao: GoalDao,
+    private val budgetDao: BudgetDao,
     scope: CoroutineScope
 ): IExpenseDataService{
 
@@ -43,6 +47,16 @@ class RoomExpenseDataService (
             .map { list -> list.map { it.toDomain() } }
             .stateIn(scope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    override val monthlyBudget: StateFlow<BigDecimal?> =
+        budgetDao.getBudget()
+            .map { it?.amount }
+            .stateIn(scope, SharingStarted.WhileSubscribed(5000), null)
+
+    override val dailyLimit: StateFlow<BigDecimal?> =
+        budgetDao.getDailyLimit()
+            .map { it?.amount }
+            .stateIn(scope, SharingStarted.WhileSubscribed(5000), null)
+
     override suspend fun getCategories(): List<Category>{
         randomErrorThrow("getCategories")
         return categoryDao.getAll().map { it.toDomain() }
@@ -51,6 +65,10 @@ class RoomExpenseDataService (
     override suspend fun getTransactions(): List<Transaction> {
         randomErrorThrow("getTransactions")
         return transactionDao.getAll().map { it.toDomain() }
+    }
+    override suspend fun getTransactionsOrderedByDate(): List<Transaction> {
+        randomErrorThrow("getTransactions")
+        return transactionDao.getAllByDateDesc().map { it.toDomain() }
     }
 
     override suspend fun updateTransaction(transaction: Transaction) {
@@ -101,5 +119,13 @@ class RoomExpenseDataService (
     override suspend fun deleteGoal(goalId: String) {
         randomErrorThrow("deleteGoal")
         goalDao.deleteById(goalId)
+    }
+
+    override suspend fun setMonthlyBudget(amount: BigDecimal) {
+        budgetDao.setBudget(BudgetEntity(amount = amount))
+    }
+
+    override suspend fun setDailyLimit(amount: BigDecimal) {
+        budgetDao.setBudget(BudgetEntity(id = BudgetEntity.ID_DAILY_LIMIT, amount = amount))
     }
 }

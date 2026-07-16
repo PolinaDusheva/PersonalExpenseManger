@@ -11,4 +11,10 @@
     <color name="transaction_income_arrow">#FF7E3FF2</color>
     <color name="transaction_transfer">#FF3A7BE5</color>
     <color name="transaction_transfer_circle">#FFE3EEFC</color>
+
+    <!-- MonthlyExpenseArc -->
+    <color name="arc_track">#FFE8E0F0</color>
+    <color name="arc_track_gray">#FFD1D5DB</color>
+    <color name="arc_label">#FF6B7280</color>
+    <color name="arc_amount">#FF1F2937</color>
 </resources>

@@ -10,20 +10,20 @@ import java.time.LocalDate
 data class GoalEntity(
     @PrimaryKey val id: String,
     val title: String,
-    val targetAmount: String,
-    val deadline: Long?
+    val targetAmount: BigDecimal,
+    val deadline: LocalDate?
 )
 
 fun GoalEntity.toDomain(): Goal = Goal(
     id = id,
     title = title,
-    targetAmount = BigDecimal(targetAmount),
-    deadline = deadline?.let { LocalDate.ofEpochDay(it) }
+    targetAmount = targetAmount,
+    deadline = deadline
 )
 
 fun Goal.toEntity(): GoalEntity = GoalEntity(
     id = id,
     title = title,
-    targetAmount = targetAmount.toPlainString(),
-    deadline = deadline?.toEpochDay()
+    targetAmount = targetAmount,
+    deadline = deadline
 )

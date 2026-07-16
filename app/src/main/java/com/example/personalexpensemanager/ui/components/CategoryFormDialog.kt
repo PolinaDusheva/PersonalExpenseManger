@@ -19,11 +19,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
+import com.example.personalexpensemanager.ui.components.appButtons.DialogConfirmButton
+import com.example.personalexpensemanager.ui.components.appButtons.DialogDismissButton
 
 @Composable
 fun CategoryFormDialog(
@@ -45,6 +48,7 @@ fun CategoryFormDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = Color.White,
         title = { Text(title) },
         text = {
             Column(
@@ -99,7 +103,7 @@ fun CategoryFormDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
+            DialogConfirmButton(text = stringResource(R.string.category_save), onClick = {
                 if (nameErrorResId != null || iconErrorResId != null) {
                     onNameFieldTouched()
                     onIconTouched()
@@ -107,14 +111,9 @@ fun CategoryFormDialog(
                     onConfirm(name, icon)
                 }
             })
-            {
-                Text(stringResource(R.string.category_save))
-            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.category_cancel))
-            }
+            DialogDismissButton(text = stringResource(R.string.action_cancel), onClick = onDismiss)
         }
     )
 }

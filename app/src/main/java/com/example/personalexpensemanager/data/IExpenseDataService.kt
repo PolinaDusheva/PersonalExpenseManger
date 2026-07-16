@@ -4,16 +4,21 @@ import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Goal
 import com.example.personalexpensemanager.domain.Transaction
 import kotlinx.coroutines.flow.StateFlow
+import java.math.BigDecimal
 
 interface IExpenseDataService {
 
         suspend fun getTransactions(): List<Transaction>
+
+        suspend fun getTransactionsOrderedByDate(): List<Transaction>
         suspend fun getCategories(): List<Category>
         suspend fun getTransaction(id: String): Transaction?
 
         val transactions: StateFlow<List<Transaction>>
         val categories: StateFlow<List<Category>>
         val goals: StateFlow<List<Goal>>
+        val monthlyBudget: StateFlow<BigDecimal?>
+        val dailyLimit: StateFlow<BigDecimal?>
 
         suspend fun addTransaction(transaction: Transaction)
         suspend fun updateTransaction(transaction: Transaction)
@@ -25,4 +30,6 @@ interface IExpenseDataService {
         suspend fun addGoal(goal: Goal)
         suspend fun updateGoal(goal: Goal)
         suspend fun deleteGoal(goalId: String)
+        suspend fun setMonthlyBudget(amount: BigDecimal)
+        suspend fun setDailyLimit(amount: BigDecimal)
 }

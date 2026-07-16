@@ -60,7 +60,7 @@ fun ExpenseLineChart(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = dimensionResource(R.dimen.statistics_card_elevation), shape = cardShape)
+            .shadow(elevation = dimensionResource(R.dimen.elevation), shape = cardShape)
             .background(Color.White, cardShape)
             .padding(dimensionResource(R.dimen.statistics_chart_padding))
     ) {

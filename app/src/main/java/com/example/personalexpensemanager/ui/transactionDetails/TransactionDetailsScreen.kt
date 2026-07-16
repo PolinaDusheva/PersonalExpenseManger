@@ -4,18 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,9 +40,16 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
+import com.example.personalexpensemanager.ui.components.appButtons.DialogConfirmButton
+import com.example.personalexpensemanager.ui.components.appButtons.DialogDismissButton
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.math.BigDecimal
 import java.time.LocalDate
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.platform.LocalContext
+import com.example.personalexpensemanager.ui.components.AppSnackbarHost
+
 @Composable
 fun TransactionDetailsScreen(
     viewModel: TransactionDetailsViewModel,
@@ -55,19 +59,34 @@ fun TransactionDetailsScreen(
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
     val deleted by viewModel.deleted.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(deleted) {
         if (deleted) onClose()
     }
 
-    TransactionDetailsScreenContent(
-        state = state.value,
-        onClose = onClose,
-        onEdit = onEdit,
-        onDelete = { viewModel.deleteTransaction() },
-        onShare = onShare,
-        onRetry = { viewModel.retry() }
-    )
+    LaunchedEffect(Unit) {
+        viewModel.snackbarEvent.collect { resId ->
+            snackbarHostState.showSnackbar(context.getString(resId))
+        }
+    }
+
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = { AppSnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            TransactionDetailsScreenContent(
+                state = state.value,
+                onClose = onClose,
+                onEdit = onEdit,
+                onDelete = { viewModel.deleteTransaction() },
+                onShare = onShare,
+                onRetry = { viewModel.retry() }
+            )
+        }
+    }
 }
 
 @Composable
@@ -123,6 +142,23 @@ fun TransactionDetailsContent(
             )
 
             Column(modifier = Modifier.fillMaxSize()) {
+                if (showDeleteDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDeleteDialog = false },
+                        containerColor = Color.White,
+                        title = { Text(stringResource(R.string.delete_confirm_title)) },
+                        text = { Text(stringResource(R.string.transaction_delete_confirm_message)) },
+                        confirmButton = {
+                            DialogConfirmButton(text = stringResource(R.string.action_ok), onClick = {
+                                showDeleteDialog = false
+                                onDelete()
+                            })
+                        },
+                        dismissButton = {
+                            DialogDismissButton(text = stringResource(R.string.action_cancel), onClick = { showDeleteDialog = false })
+                        }
+                    )
+                }
                 TransactionDetailsHeader(
                     transaction = transaction,
                     category = category,

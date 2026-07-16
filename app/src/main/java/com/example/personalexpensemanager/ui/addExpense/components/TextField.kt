@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.example.personalexpensemanager.R
@@ -57,7 +56,7 @@ fun TextField(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = dimensionResource(R.dimen.add_expense_field_elevation),
+                elevation = dimensionResource(R.dimen.elevation),
                 shape = RoundedCornerShape(dimensionResource(R.dimen.add_expense_field_corner_radius))
             )
             .background(Color.White, RoundedCornerShape(dimensionResource(R.dimen.add_expense_field_corner_radius)))

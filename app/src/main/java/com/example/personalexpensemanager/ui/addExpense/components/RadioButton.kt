@@ -40,7 +40,7 @@ fun <T> RadioButton(
         Box(
             modifier = Modifier
                 .size(dimensionResource(R.dimen.add_expense_radio_circle_size))
-                .shadow(elevation = dimensionResource(R.dimen.add_expense_radio_circle_elevation), shape = CircleShape)
+                .shadow(elevation = dimensionResource(R.dimen.elevation), shape = CircleShape)
                 .background(Color.White, CircleShape)
                 .border(
                     width = dimensionResource(R.dimen.add_expense_radio_circle_border_width),

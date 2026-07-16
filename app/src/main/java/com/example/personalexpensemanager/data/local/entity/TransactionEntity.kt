@@ -13,38 +13,38 @@ import java.time.LocalDate
 data class TransactionEntity(
     @PrimaryKey val id: String,
     val title: String,
-    val amount: String,
-    val date: Long,
-    val currency: String,
-    val type: String,
+    val amount: BigDecimal,
+    val date: LocalDate,
+    val currency: Currency,
+    val type: TransactionType,
     val categoryId: String?,
     val description: String,
-    val paymentMethod: String,
+    val paymentMethod: PaymentMethod,
     val goalId: String?
 )
 
 fun TransactionEntity.toDomain(): Transaction = Transaction(
     id = id,
     title = title,
-    amount = BigDecimal(amount),
-    date = LocalDate.ofEpochDay(date),
-    currency = Currency.valueOf(currency),
-    type = TransactionType.valueOf(type),
+    amount = amount,
+    date = date,
+    currency = currency,
+    type = type,
     categoryId = categoryId,
     description = description,
-    paymentMethod = PaymentMethod.valueOf(paymentMethod),
+    paymentMethod = paymentMethod,
     goalId = goalId
 )
 
 fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
     id = id,
     title = title,
-    amount = amount.toPlainString(),
-    date = date.toEpochDay(),
-    currency = currency.name,
-    type = type.name,
+    amount = amount,
+    date = date,
+    currency = currency,
+    type = type,
     categoryId = categoryId,
     description = description,
-    paymentMethod = paymentMethod.name,
+    paymentMethod = paymentMethod,
     goalId = goalId
 )

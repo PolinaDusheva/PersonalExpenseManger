@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.data.IExpenseDataService
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class TransactionDetailsViewModel(
@@ -15,6 +18,9 @@ class TransactionDetailsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ITransactionDetailsUIState>(ITransactionDetailsUIState.Loading)
     val uiState: StateFlow<ITransactionDetailsUIState> = _uiState
+
+    private val _snackbarEvent = MutableSharedFlow<Int>()
+    val snackbarEvent: SharedFlow<Int> = _snackbarEvent.asSharedFlow()
 
     private val _deleted = MutableStateFlow(false)
     val deleted: StateFlow<Boolean> = _deleted
@@ -44,15 +50,16 @@ class TransactionDetailsViewModel(
     fun retry() = load()
 
     fun deleteTransaction() {
+        val currentState = _uiState.value
         viewModelScope.launch {
-            _uiState.value = ITransactionDetailsUIState.Loading
             try {
                 dataService.deleteTransaction(transactionId)
                 _deleted.value = true
-            } catch (e: CancellationException){
-                throw  e
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                _uiState.value = ITransactionDetailsUIState.Error(R.string.generic_error)
+                _uiState.value = currentState
+                _snackbarEvent.emit(R.string.error_delete_transaction)
             }
         }
     }

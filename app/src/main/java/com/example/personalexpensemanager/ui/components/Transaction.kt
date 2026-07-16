@@ -30,20 +30,23 @@ import java.time.LocalDate
 import com.example.personalexpensemanager.domain.enums.TransactionType
 import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.amountColorRes
-import com.example.personalexpensemanager.domain.enums.arrowColorRes
-import com.example.personalexpensemanager.domain.enums.circleColorRes
 import com.example.personalexpensemanager.domain.enums.icon
 import com.example.personalexpensemanager.domain.enums.signSymbol
 import com.example.personalexpensemanager.domain.enums.symbol
 import java.math.BigDecimal
-
+import com.example.personalexpensemanager.domain.Category
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import com.example.personalexpensemanager.ui.theme.GradientGraphics
 
 @Composable
-fun TransactionItem(transaction: Transaction) {
+fun TransactionItem(transaction: Transaction, category: Category? = null) {
     val amountColor = colorResource(transaction.type.amountColorRes)
-    val circleColor = colorResource(transaction.type.circleColorRes)
-    val arrowColor = colorResource(transaction.type.arrowColorRes)
-    val arrowIcon = transaction.type.icon
+    val displayIcon = category?.let { categoryIconFilled(it.iconName) } ?: transaction.type.icon
+    val iconBrush = GradientGraphics.primaryHorizontal
 
     Row(
         modifier = Modifier
@@ -56,13 +59,26 @@ fun TransactionItem(transaction: Transaction) {
             Box(
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.transaction_icon_circle_size))
-                    .background(circleColor, CircleShape),
+                    .background(Color.White, CircleShape)
+                    .border(
+                        width = dimensionResource(R.dimen.transaction_icon_border_width),
+                        brush = iconBrush,
+                        shape = CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = arrowIcon,
+                    imageVector = displayIcon,
                     contentDescription = null,
-                    tint = arrowColor
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .graphicsLayer(alpha = 0.99f)
+                        .drawWithCache {
+                            onDrawWithContent {
+                                drawContent()
+                                drawRect(brush = iconBrush, blendMode = BlendMode.SrcAtop)
+                            }
+                        }
                 )
             }
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.transaction_icon_text_spacing)))

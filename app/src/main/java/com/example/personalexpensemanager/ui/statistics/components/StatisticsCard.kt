@@ -43,7 +43,7 @@ fun StatisticsCard(
 
     Column(
         modifier = modifier
-            .shadow(elevation = dimensionResource(R.dimen.statistics_card_elevation), shape = shape)
+            .shadow(elevation = dimensionResource(R.dimen.elevation), shape = shape)
             .then(background)
             .padding(dimensionResource(R.dimen.padding_standard))
     ) {

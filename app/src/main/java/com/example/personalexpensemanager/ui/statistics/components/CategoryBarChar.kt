@@ -32,13 +32,34 @@ import com.example.personalexpensemanager.ui.theme.GradientStart
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.math.BigDecimal
 import java.text.DecimalFormat
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun CategoryBarChart(
     categoryTotals: List<CategorySpend>,
     modifier: Modifier = Modifier
 ) {
-    if (categoryTotals.isEmpty()) return
+    if (categoryTotals.isEmpty()) {
+        val cardShape = RoundedCornerShape(dimensionResource(R.dimen.statistics_chart_corner_radius))
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .shadow(elevation = dimensionResource(R.dimen.elevation), shape = cardShape, spotColor = Color.Transparent)
+                .background(Color.White, cardShape)
+                .padding(dimensionResource(R.dimen.statistics_chart_padding))
+                .height(dimensionResource(R.dimen.bar_chart_height)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard_no_categories),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+        }
+        return
+    }
 
     val maxAmount = categoryTotals.maxOf { it.amount }.toFloat().coerceAtLeast(1f)
     val cardShape = RoundedCornerShape(dimensionResource(R.dimen.statistics_chart_corner_radius))
@@ -47,7 +68,7 @@ fun CategoryBarChart(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = dimensionResource(R.dimen.statistics_card_elevation), shape = cardShape)
+            .shadow(elevation = dimensionResource(R.dimen.elevation), shape = cardShape)
             .background(Color.White, cardShape)
             .padding(dimensionResource(R.dimen.statistics_chart_padding))
             .height(dimensionResource(R.dimen.bar_chart_height)),

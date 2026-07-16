@@ -16,7 +16,7 @@ fun TransactionInfoCard(rows: List<Pair<String, String>>) {
     Surface(
         shape = RoundedCornerShape(dimensionResource(R.dimen.transaction_detail_card_corner_radius)),
         color = Color.White,
-        shadowElevation = dimensionResource(R.dimen.transaction_detail_info_card_elevation)
+        shadowElevation = dimensionResource(R.dimen.elevation)
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(R.dimen.transaction_detail_card_padding)),

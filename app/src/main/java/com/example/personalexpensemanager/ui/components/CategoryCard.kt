@@ -24,7 +24,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
@@ -42,7 +41,7 @@ fun CategoryCard(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1.6f)
-            .shadow(elevation = dimensionResource(R.dimen.category_card_elevation), shape = shape)
+            .shadow(elevation = dimensionResource(R.dimen.elevation), shape = shape)
             .clip(shape)
             .background(Brush.linearGradient(gradient))
             .clickable { onClick() }

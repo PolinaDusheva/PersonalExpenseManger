@@ -6,13 +6,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
 @Composable
-fun Headline(text: String, spacerHeight: Dp = 8.dp) {
+fun Headline(
+    text: String,
+    spacerHeight: Dp = dimensionResource(R.dimen.headline_spacer)) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineSmall

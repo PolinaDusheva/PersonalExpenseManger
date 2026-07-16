@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.StackedBarChart
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
@@ -37,20 +40,34 @@ import com.example.personalexpensemanager.ui.components.TransactionItem
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import com.example.personalexpensemanager.ui.components.TransactionFilterChip
+import com.example.personalexpensemanager.ui.addExpense.components.TransactionFilterChip
+import com.example.personalexpensemanager.ui.statistics.components.Period
 import java.math.BigDecimal
+import com.example.personalexpensemanager.ui.components.appButtons.GradientIconButton
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import com.example.personalexpensemanager.ui.components.AppDatePickerDialog
+import com.example.personalexpensemanager.ui.components.appDatePickerColors
+import java.time.Instant
+import java.time.ZoneOffset
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SuccessScreen(
     state: ITransactionUIState.Success,
     onRefresh: () -> Unit,
+    isRefreshing: Boolean,
     onCategorySelected: (String?) -> Unit,
     onSortSelected: (SortingType) -> Unit,
+    onPeriodSelected: (Period?) -> Unit,
     onTransactionClick: (String) -> Unit
 ) {
     PullToRefreshBox(
-        isRefreshing = false,
+        isRefreshing = isRefreshing,
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize()
     ) {
@@ -60,6 +77,8 @@ fun SuccessScreen(
                 .background(Color.White)
         ) {
             stickyHeader {
+                var showRangePicker by remember { mutableStateOf(false) }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -86,6 +105,37 @@ fun SuccessScreen(
                         selected = state.sortingType == SortingType.DATE,
                         onClick = { onSortSelected(SortingType.DATE) }
                     )
+                    TransactionFilterChip(
+                        text = if (state.selectedPeriod != null)
+                            "${state.selectedPeriod.start} – ${state.selectedPeriod.end}"
+                        else stringResource(R.string.period_custom),
+                        selected = state.selectedPeriod != null,
+                        onClick = { showRangePicker = true }
+                    )
+                }
+
+                if (showRangePicker) {
+                    val rangeState = rememberDateRangePickerState()
+                    AppDatePickerDialog(
+                        onDismissRequest = { showRangePicker = false },
+                        onConfirm = {
+                            val startMillis = rangeState.selectedStartDateMillis
+                            val endMillis = rangeState.selectedEndDateMillis
+                            if (startMillis != null && endMillis != null) {
+                                val start = Instant.ofEpochMilli(startMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                                val end = Instant.ofEpochMilli(endMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                                onPeriodSelected(Period.custom(start, end))
+                            }
+                            showRangePicker = false
+                        },
+                        confirmText = stringResource(R.string.action_ok),
+                        dismissText = stringResource(R.string.action_cancel)
+                    ) {
+                        DateRangePicker(
+                            state = rangeState,
+                            colors = appDatePickerColors()
+                        )
+                    }
                 }
             }
 
@@ -114,7 +164,10 @@ fun SuccessScreen(
                                 .clickable { onTransactionClick(transaction.id) }
                                 .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                         ) {
-                            TransactionItem(transaction)
+                            TransactionItem(
+                                transaction = transaction,
+                                category = state.categoriesById[transaction.categoryId]
+                            )
                         }
                     }
                 }
@@ -129,7 +182,10 @@ fun SuccessScreen(
                             .clickable { onTransactionClick(transaction.id) }
                             .padding(horizontal = dimensionResource(R.dimen.padding_horizontal))
                     ) {
-                        TransactionItem(transaction)
+                        TransactionItem(
+                            transaction = transaction,
+                            category = state.categoriesById[transaction.categoryId]
+                        )
                     }
                 }
             }
@@ -141,29 +197,37 @@ fun SuccessScreen(
 fun TransactionsScreen(
     viewModel: TransactionViewModel,
     onBack: () -> Unit = {},
-    onTransactionClick: (String) -> Unit = {}
+    onTransactionClick: (String) -> Unit = {},
+    onStatisticsClick: () -> Unit = {}
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing = viewModel.isRefreshing.collectAsStateWithLifecycle()
     TransactionsContent(
         state = state.value,
+        isRefreshing = isRefreshing.value,
         onBack = onBack,
         onRefresh = viewModel::refresh,
         onRetry = viewModel::retry,
         onCategorySelected = viewModel::filterByCategory,
         onSortSelected = viewModel::sortBy,
-        onTransactionClick = onTransactionClick
+        onPeriodSelected = viewModel::filterByPeriod,
+        onTransactionClick = onTransactionClick,
+        onStatisticsClick = onStatisticsClick
     )
 }
 
 @Composable
 fun TransactionsContent(
     state: ITransactionUIState,
+    isRefreshing: Boolean = false,
     onBack: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onRetry: () -> Unit = {},
     onCategorySelected: (String?) -> Unit = {},
     onSortSelected: (SortingType) -> Unit = {},
-    onTransactionClick: (String) -> Unit = {}
+    onPeriodSelected: (Period?) -> Unit = {},
+    onTransactionClick: (String) -> Unit = {},
+    onStatisticsClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -172,16 +236,29 @@ fun TransactionsContent(
             .statusBarsPadding()
             .padding(top = dimensionResource(R.dimen.padding_small))
     ) {
-        Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Headline(text = stringResource(R.string.transaction_history))
+            GradientIconButton(
+                icon = Icons.Filled.StackedBarChart,
+                contentDescription = stringResource(R.string.nav_statistics),
+                onClick = onStatisticsClick
+            )
         }
-        when (state)  {
+        when (state) {
             is ITransactionUIState.Loading -> CircularProgressIndicator()
             is ITransactionUIState.Success -> SuccessScreen(
                 state = state,
                 onRefresh = onRefresh,
+                isRefreshing = isRefreshing,
                 onCategorySelected = onCategorySelected,
                 onSortSelected = onSortSelected,
+                onPeriodSelected = onPeriodSelected,
                 onTransactionClick = onTransactionClick
             )
             is ITransactionUIState.Error -> ErrorScreen(
@@ -210,6 +287,10 @@ fun TransactionScreenPreview() {
                     Category("1", "food", "Храна"),
                     Category("2", "transport", "Транспорт")
                 ),
+                categoriesById = mapOf(
+                    "1" to Category("1", "food", "Храна"),
+                    "2" to Category("2", "transport", "Транспорт")
+                ),
                 selectedCategory = null,
                 sortingType = SortingType.NONE
             )
@@ -234,6 +315,10 @@ fun TransactionScreenGroupedPreview() {
                 categories = listOf(
                     Category("1", "food", "Храна"),
                     Category("2", "transport", "Транспорт")
+                ),
+                categoriesById = mapOf(
+                    "1" to Category("1", "food", "Храна"),
+                    "2" to Category("2", "transport", "Транспорт")
                 ),
                 selectedCategory = null,
                 sortingType = SortingType.DATE

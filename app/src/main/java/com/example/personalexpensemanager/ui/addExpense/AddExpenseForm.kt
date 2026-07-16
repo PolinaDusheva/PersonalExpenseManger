@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,9 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.domain.Goal
-import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.domain.enums.TransactionType
-import com.example.personalexpensemanager.ui.addExpense.components.DateField
+import com.example.personalexpensemanager.ui.components.DateField
 import com.example.personalexpensemanager.ui.addExpense.components.PaymentMethodSelector
 import com.example.personalexpensemanager.ui.addExpense.components.TextField
 import com.example.personalexpensemanager.ui.addExpense.components.TransactionTypeSelector
@@ -46,68 +44,27 @@ import com.example.personalexpensemanager.ui.components.GoalDropdown
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.appButtons.PrimaryButton
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
-import java.math.BigDecimal
-import java.time.LocalDate
-import androidx.compose.runtime.LaunchedEffect
-import com.example.personalexpensemanager.domain.Transaction
 
 @Composable
 fun AddExpenseForm(
-    categories: List<Category>,
-    goals: List<Goal> = emptyList(),
-    isSaving: Boolean,
+    state: AddExpenseFormState,
     formErrors: AddExpenseFormErrors,
-    existingTransaction: Transaction? = null,
-    onTitleChanged: (String) -> Unit,
-    onTitleTouched: () -> Unit,
-    onAmountChanged: (String) -> Unit,
-    onAmountTouched: () -> Unit,
-    onDescriptionChanged: (String) -> Unit,
-    onDescriptionTouched: () -> Unit,
-    onDateSelected: (LocalDate?) -> Unit,
-    onCategorySelected: () -> Unit,
+    categories: List<Category>,
+    goals: List<Goal>,
+    isSaving: Boolean,
+    isEdit: Boolean,
+    actions: AddExpenseActions,
     onNavigateToCategories: () -> Unit = {},
-    onSave: (String, BigDecimal, String?, LocalDate?, String, PaymentMethod, TransactionType, String?) -> Unit
+    onNavigateToGoals: () -> Unit = {}
 ) {
-    val isEdit = existingTransaction != null
-    var step by remember { mutableIntStateOf(if (isEdit) 2 else 1) }
-
-    var paymentMethod by remember { mutableStateOf(existingTransaction?.paymentMethod ?: PaymentMethod.CARD) }
-    var transactionType by remember { mutableStateOf(existingTransaction?.type ?: TransactionType.EXPENSE) }
-
-    var title by remember { mutableStateOf(existingTransaction?.title ?: "") }
-    var amount by remember { mutableStateOf(existingTransaction?.amount?.toPlainString() ?: "") }
-    var description by remember { mutableStateOf(existingTransaction?.description ?: "") }
-    var selectedCategory by remember { mutableStateOf<Category?>(null) }
-    var selectedGoal by remember { mutableStateOf<Goal?>(null) }
-    var date by remember { mutableStateOf(existingTransaction?.date) }
-
-    LaunchedEffect(categories, existingTransaction) {
-        if (existingTransaction != null && selectedCategory == null) {
-            selectedCategory = categories.find { it.id == existingTransaction.categoryId }
-        }
-    }
-
-    LaunchedEffect(goals, existingTransaction) {
-        if (existingTransaction != null && selectedGoal == null) {
-            selectedGoal = goals.find { it.id == existingTransaction.goalId }
-        }
-    }
-    LaunchedEffect(existingTransaction) {
-        if (existingTransaction != null) {
-            title = existingTransaction.title
-            amount = existingTransaction.amount.toPlainString()
-            description = existingTransaction.description
-            date = existingTransaction.date
-            paymentMethod = existingTransaction.paymentMethod
-            transactionType = existingTransaction.type
-        }
-    }
+    val selectedCategory = categories.find { it.id == state.selectedCategoryId }
+    val selectedGoal = goals.find { it.id == state.selectedGoalId }
 
     var titleWasFocused by remember { mutableStateOf(false) }
     var amountWasFocused by remember { mutableStateOf(false) }
     var descriptionWasFocused by remember { mutableStateOf(false) }
-
+    var categoryDropdownClicked by remember { mutableStateOf(false) }
+    var goalDropdownClicked by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -141,26 +98,23 @@ fun AddExpenseForm(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.add_expense_field_spacing))
             ) {
-                if (step == 1) {
+                if (state.step == 1) {
                     PaymentMethodSelector(
-                        selected = paymentMethod,
-                        onSelect = { paymentMethod = it }
+                        selected = state.paymentMethod,
+                        onSelect = actions::onPaymentMethodChanged
                     )
                     TransactionTypeSelector(
-                        selected = transactionType,
-                        onSelect = { transactionType = it }
+                        selected = state.transactionType,
+                        onSelect = actions::onTransactionTypeChanged
                     )
                 } else {
                     Column {
                         TextField(
-                            value = title,
-                            onValueChange = {
-                                title = it
-                                onTitleChanged(it)
-                            },
+                            value = state.title,
+                            onValueChange = actions::onTitleChanged,
                             label = stringResource(R.string.add_expense_title_label),
                             modifier = Modifier.onFocusChanged { focusState ->
-                                if (titleWasFocused && !focusState.isFocused) onTitleTouched()
+                                if (titleWasFocused && !focusState.isFocused) actions.onTitleTouched()
                                 titleWasFocused = focusState.isFocused
                             }
                         )
@@ -174,15 +128,12 @@ fun AddExpenseForm(
                     }
                     Column {
                         TextField(
-                            value = amount,
-                            onValueChange = {
-                                amount = it
-                                onAmountChanged(it)
-                            },
+                            value = state.amount,
+                            onValueChange = actions::onAmountChanged,
                             label = stringResource(R.string.add_expense_amount_label),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.onFocusChanged { focusState ->
-                                if (amountWasFocused && !focusState.isFocused) onAmountTouched()
+                                if (amountWasFocused && !focusState.isFocused) actions.onAmountTouched()
                                 amountWasFocused = focusState.isFocused
                             }
                         )
@@ -197,11 +148,8 @@ fun AddExpenseForm(
 
                     Column {
                         DateField(
-                            date = date,
-                            onDateSelected = {
-                                date = it
-                                onDateSelected(it)
-                            }
+                            date = state.date,
+                            onDateSelected = { actions.onDateSelected(it) }
                         )
                         if (formErrors.dateTouched && formErrors.dateErrorResId != null) {
                             Text(
@@ -214,14 +162,11 @@ fun AddExpenseForm(
 
                     Column {
                         TextField(
-                            value = description,
-                            onValueChange = {
-                                description = it
-                                onDescriptionChanged(it)
-                            },
+                            value = state.description,
+                            onValueChange = actions::onDescriptionChanged,
                             label = stringResource(R.string.add_expense_description_label),
                             modifier = Modifier.onFocusChanged { focusState ->
-                                if (descriptionWasFocused && !focusState.isFocused) onDescriptionTouched()
+                                if (descriptionWasFocused && !focusState.isFocused) actions.onDescriptionTouched()
                                 descriptionWasFocused = focusState.isFocused
                             }
                         )
@@ -234,15 +179,45 @@ fun AddExpenseForm(
                         }
                     }
 
-                    if (transactionType == TransactionType.TRANSFER) {
-                        GoalDropdown(
-                            goals = goals,
-                            selectedGoal = selectedGoal,
-                            onGoalSelected = { goal -> selectedGoal = goal }
-                        )
+                    if (state.transactionType == TransactionType.TRANSFER) {
+                        Column {
+                            GoalDropdown(
+                                goals = goals,
+                                selectedGoal = selectedGoal,
+                                onGoalSelected = { goal -> actions.onGoalSelected(goal?.id) },
+                                onChipClicked = if (goals.isEmpty()) {
+                                    { goalDropdownClicked = true }
+                                } else null
+                            )
+                            if (goals.isEmpty() && goalDropdownClicked) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.goals_empty_state),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray
+                                    )
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                                    PrimaryButton(
+                                        text = stringResource(R.string.goals_add_description),
+                                        onClick = onNavigateToGoals
+                                    )
+                                }
+                            }
+                        }
                     } else {
                         Column {
-                            if (categories.isEmpty() && !isSaving) {
+                            CategoryDropdown(
+                                categories = categories,
+                                selectedCategory = selectedCategory,
+                                onCategorySelected = { category -> actions.onCategorySelected(category?.id) },
+                                onChipClicked = if (categories.isEmpty()) {
+                                    { categoryDropdownClicked = true }
+                                } else null
+                            )
+                            if (categories.isEmpty() && categoryDropdownClicked) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalAlignment = Alignment.CenterHorizontally
@@ -258,15 +233,6 @@ fun AddExpenseForm(
                                         onClick = onNavigateToCategories
                                     )
                                 }
-                            } else {
-                                CategoryDropdown(
-                                    categories = categories,
-                                    selectedCategory = selectedCategory,
-                                    onCategorySelected = {
-                                        selectedCategory = it
-                                        onCategorySelected()
-                                    }
-                                )
                             }
                             if (formErrors.categoryTouched && formErrors.categoryErrorResId != null) {
                                 Text(
@@ -286,31 +252,20 @@ fun AddExpenseForm(
                     .padding(horizontal = dimensionResource(R.dimen.add_expense_padding)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                if (step == 1) {
+                if (state.step == 1) {
                     PrimaryButton(
                         text = stringResource(R.string.next),
-                        onClick = { step = 2 }
+                        onClick = { actions.onStepChanged(2) }
                     )
                 } else {
                     PrimaryButton(
                         text = stringResource(R.string.category_save),
                         enabled = !isSaving,
-                        onClick = {
-                            onSave(
-                                title,
-                                amount.toBigDecimalOrNull() ?: BigDecimal.ZERO,
-                                if (transactionType == TransactionType.TRANSFER) null else selectedCategory?.id,
-                                date,
-                                description,
-                                paymentMethod,
-                                transactionType,
-                                if (transactionType == TransactionType.TRANSFER) selectedGoal?.id else null
-                            )
-                        }
+                        onClick = actions::onSave
                     )
                     PrimaryButton(
                         text = stringResource(R.string.back),
-                        onClick = { step = 1 }
+                        onClick = { actions.onStepChanged(1) }
                     )
                 }
             }
@@ -318,61 +273,27 @@ fun AddExpenseForm(
     }
 }
 
-@Preview(showBackground = true, name = "Step 1")
+@Preview(showBackground = true, name = "Step 2")
 @Composable
-fun AddExpenseStepOnePreview() {
+fun AddExpenseStepTwoPreview() {
     PersonalExpenseManagerTheme {
         AddExpenseForm(
-            categories = listOf(
-                Category("1", "restaurant", "Храна"),
-                Category("2", "car", "Транспорт")
+            state = AddExpenseFormState(
+                step = 2,
+                title = "Наем",
+                amount = "660",
+                description = "Месечен наем",
+                selectedCategoryId = "1"
             ),
-            isSaving = false,
             formErrors = AddExpenseFormErrors(),
-            onTitleChanged = {},
-            onTitleTouched = {},
-            onAmountChanged = {},
-            onAmountTouched = {},
-            onDescriptionChanged = {},
-            onDescriptionTouched = {},
-            onDateSelected = {},
-            onCategorySelected = {},
-            onSave = { _, _, _, _, _, _, _, _ -> }
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Step 2 with errors")
-@Composable
-fun AddExpenseStepTwoErrorsPreview() {
-    PersonalExpenseManagerTheme {
-        AddExpenseForm(
             categories = listOf(
                 Category("1", "restaurant", "Храна"),
                 Category("2", "car", "Транспорт")
             ),
+            goals = emptyList(),
             isSaving = false,
-            formErrors = AddExpenseFormErrors(
-                titleErrorResId = R.string.validation_title_empty,
-                amountErrorResId = R.string.validation_amount_required,
-                descriptionErrorResId = R.string.validation_description_empty,
-                dateErrorResId = R.string.validation_date_required,
-                categoryErrorResId = R.string.validation_category_required,
-                titleTouched = true,
-                amountTouched = true,
-                descriptionTouched = true,
-                dateTouched = true,
-                categoryTouched = true
-            ),
-            onTitleChanged = {},
-            onTitleTouched = {},
-            onAmountChanged = {},
-            onAmountTouched = {},
-            onDescriptionChanged = {},
-            onDescriptionTouched = {},
-            onDateSelected = {},
-            onCategorySelected = {},
-            onSave = { _, _, _, _, _, _, _, _ -> }
+            isEdit = false,
+            actions = object : AddExpenseActions {}
         )
     }
 }
