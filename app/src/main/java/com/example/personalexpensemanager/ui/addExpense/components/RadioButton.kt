@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
+import com.example.personalexpensemanager.ui.theme.ProgressTrackLight
 
 @Composable
 fun <T> RadioButton(
@@ -45,7 +46,7 @@ fun <T> RadioButton(
                 .border(
                     width = dimensionResource(R.dimen.add_expense_radio_circle_border_width),
                     brush = if (selected) GradientGraphics.primaryHorizontal
-                    else Brush.linearGradient(listOf(Color.LightGray, Color.LightGray)),
+                    else Brush.linearGradient(listOf(ProgressTrackLight, ProgressTrackLight)),
                     shape = CircleShape
                 )
                 .padding(dimensionResource(R.dimen.add_expense_radio_circle_padding))

@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -44,6 +43,10 @@ import com.example.personalexpensemanager.ui.components.GoalDropdown
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.appButtons.PrimaryButton
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
+import com.example.personalexpensemanager.ui.theme.TextSecondary
+
+private const val FORM_CONTENT_WEIGHT = 0.75f
+private const val FORM_ACTIONS_WEIGHT = 0.25f
 
 @Composable
 fun AddExpenseForm(
@@ -60,9 +63,7 @@ fun AddExpenseForm(
     val selectedCategory = categories.find { it.id == state.selectedCategoryId }
     val selectedGoal = goals.find { it.id == state.selectedGoalId }
 
-    var titleWasFocused by remember { mutableStateOf(false) }
-    var amountWasFocused by remember { mutableStateOf(false) }
-    var descriptionWasFocused by remember { mutableStateOf(false) }
+
     var categoryDropdownClicked by remember { mutableStateOf(false) }
     var goalDropdownClicked by remember { mutableStateOf(false) }
 
@@ -92,7 +93,7 @@ fun AddExpenseForm(
 
             Column(
                 modifier = Modifier
-                    .weight(0.75f)
+                    .weight(FORM_CONTENT_WEIGHT)
                     .padding(horizontal = dimensionResource(R.dimen.add_expense_padding))
                     .padding(top = dimensionResource(R.dimen.add_expense_padding))
                     .verticalScroll(rememberScrollState()),
@@ -113,12 +114,8 @@ fun AddExpenseForm(
                             value = state.title,
                             onValueChange = actions::onTitleChanged,
                             label = stringResource(R.string.add_expense_title_label),
-                            modifier = Modifier.onFocusChanged { focusState ->
-                                if (titleWasFocused && !focusState.isFocused) actions.onTitleTouched()
-                                titleWasFocused = focusState.isFocused
-                            }
                         )
-                        if (formErrors.titleTouched && formErrors.titleErrorResId != null) {
+                        if (formErrors.submitted && formErrors.titleErrorResId != null) {
                             Text(
                                 text = stringResource(formErrors.titleErrorResId),
                                 color = MaterialTheme.colorScheme.error,
@@ -132,12 +129,8 @@ fun AddExpenseForm(
                             onValueChange = actions::onAmountChanged,
                             label = stringResource(R.string.add_expense_amount_label),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.onFocusChanged { focusState ->
-                                if (amountWasFocused && !focusState.isFocused) actions.onAmountTouched()
-                                amountWasFocused = focusState.isFocused
-                            }
                         )
-                        if (formErrors.amountTouched && formErrors.amountErrorResId != null) {
+                        if (formErrors.submitted && formErrors.amountErrorResId != null) {
                             Text(
                                 text = stringResource(formErrors.amountErrorResId),
                                 color = MaterialTheme.colorScheme.error,
@@ -151,7 +144,7 @@ fun AddExpenseForm(
                             date = state.date,
                             onDateSelected = { actions.onDateSelected(it) }
                         )
-                        if (formErrors.dateTouched && formErrors.dateErrorResId != null) {
+                        if (formErrors.submitted && formErrors.dateErrorResId != null) {
                             Text(
                                 text = stringResource(formErrors.dateErrorResId),
                                 color = MaterialTheme.colorScheme.error,
@@ -165,12 +158,8 @@ fun AddExpenseForm(
                             value = state.description,
                             onValueChange = actions::onDescriptionChanged,
                             label = stringResource(R.string.add_expense_description_label),
-                            modifier = Modifier.onFocusChanged { focusState ->
-                                if (descriptionWasFocused && !focusState.isFocused) actions.onDescriptionTouched()
-                                descriptionWasFocused = focusState.isFocused
-                            }
                         )
-                        if (formErrors.descriptionTouched && formErrors.descriptionErrorResId != null) {
+                        if (formErrors.submitted && formErrors.descriptionErrorResId != null) {
                             Text(
                                 text = stringResource(formErrors.descriptionErrorResId),
                                 color = MaterialTheme.colorScheme.error,
@@ -197,7 +186,7 @@ fun AddExpenseForm(
                                     Text(
                                         text = stringResource(R.string.goals_empty_state),
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.Gray
+                                        color = TextSecondary
                                     )
                                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                                     PrimaryButton(
@@ -225,7 +214,7 @@ fun AddExpenseForm(
                                     Text(
                                         text = stringResource(R.string.categories_empty_state),
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.Gray
+                                        color = TextSecondary
                                     )
                                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                                     PrimaryButton(
@@ -234,9 +223,9 @@ fun AddExpenseForm(
                                     )
                                 }
                             }
-                            if (formErrors.categoryTouched && formErrors.categoryErrorResId != null) {
+                            if (formErrors.submitted && formErrors.goalErrorResId != null) {
                                 Text(
-                                    text = stringResource(formErrors.categoryErrorResId),
+                                    text = stringResource(formErrors.goalErrorResId),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodySmall
                                 )
@@ -248,7 +237,7 @@ fun AddExpenseForm(
 
             Column(
                 modifier = Modifier
-                    .weight(0.25f)
+                    .weight(FORM_ACTIONS_WEIGHT)
                     .padding(horizontal = dimensionResource(R.dimen.add_expense_padding)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {

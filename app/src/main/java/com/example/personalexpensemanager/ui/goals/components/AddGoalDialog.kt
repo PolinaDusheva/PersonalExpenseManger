@@ -21,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -33,6 +35,7 @@ import com.example.personalexpensemanager.ui.components.DateField
 import com.example.personalexpensemanager.ui.components.appButtons.DialogConfirmButton
 import com.example.personalexpensemanager.ui.components.appButtons.DialogDismissButton
 import com.example.personalexpensemanager.ui.goals.GoalFormErrors
+import com.example.personalexpensemanager.ui.theme.GradientGraphics
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -40,9 +43,7 @@ import java.time.LocalDate
 fun AddGoalDialog(
     formErrors: GoalFormErrors,
     onTitleChanged: (String) -> Unit,
-    onTitleTouched: () -> Unit,
     onAmountChanged: (String) -> Unit,
-    onAmountTouched: () -> Unit,
     onConfirm: (title: String, targetAmount: BigDecimal, deadline: LocalDate?) -> Unit,
     onDismiss: () -> Unit,
     editingGoal: Goal? = null,
@@ -52,8 +53,6 @@ fun AddGoalDialog(
     var title by remember { mutableStateOf(editingGoal?.title ?: "") }
     var amountText by remember { mutableStateOf(editingGoal?.targetAmount?.toPlainString() ?: "") }
     var deadline by remember { mutableStateOf(editingGoal?.deadline) }
-    var titleWasFocused by remember { mutableStateOf(false) }
-    var amountWasFocused by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -75,7 +74,15 @@ fun AddGoalDialog(
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .graphicsLayer(alpha = 0.99f)
+                                .drawWithCache {
+                                    onDrawWithContent {
+                                        drawContent()
+                                        drawRect(brush = GradientGraphics.primaryHorizontal, blendMode = BlendMode.SrcAtop)
+                                    }
+                                }
                         )
                     }
                 }
@@ -86,7 +93,7 @@ fun AddGoalDialog(
                     onDismissRequest = { showDeleteConfirm = false },
                     containerColor = Color.White,
                     title = { Text(stringResource(R.string.delete_confirm_title)) },
-                    text = { Text(stringResource(R.string.delete_confirm_message, editingGoal!!.title)) },
+                    text = { Text(stringResource(R.string.goal_delete_confirm_message, editingGoal!!.title)) },
                     confirmButton = {
                         DialogConfirmButton(
                             text = stringResource(R.string.delete_confirm_title),
@@ -115,13 +122,9 @@ fun AddGoalDialog(
                             title = it
                             onTitleChanged(it)
                         },
-                        label = stringResource(R.string.goal_name_label),
-                        modifier = Modifier.onFocusChanged { focusState ->
-                            if (titleWasFocused && !focusState.isFocused) onTitleTouched()
-                            titleWasFocused = focusState.isFocused
-                        }
+                        label = stringResource(R.string.goal_name_label)
                     )
-                    if (formErrors.titleTouched && formErrors.titleErrorResId != null) {
+                    if (formErrors.submitted && formErrors.titleErrorResId != null) {
                         Text(
                             text = stringResource(formErrors.titleErrorResId),
                             color = MaterialTheme.colorScheme.error,
@@ -140,13 +143,9 @@ fun AddGoalDialog(
                             onAmountChanged(it)
                         },
                         label = stringResource(R.string.goal_amount_label),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.onFocusChanged { focusState ->
-                            if (amountWasFocused && !focusState.isFocused) onAmountTouched()
-                            amountWasFocused = focusState.isFocused
-                        }
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
-                    if (formErrors.amountTouched && formErrors.amountErrorResId != null) {
+                    if (formErrors.submitted && formErrors.amountErrorResId != null) {
                         Text(
                             text = stringResource(formErrors.amountErrorResId),
                             color = MaterialTheme.colorScheme.error,

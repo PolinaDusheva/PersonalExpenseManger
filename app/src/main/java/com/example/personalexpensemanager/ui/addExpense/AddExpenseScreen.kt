@@ -36,6 +36,8 @@ fun AddExpenseScreen(
     val formErrors by viewModel.formErrors.collectAsStateWithLifecycle()
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val showLimitWarning by viewModel.showDailyLimitWarning.collectAsStateWithLifecycle()
+    val showBudgetWarning by viewModel.showBudgetWarning.collectAsStateWithLifecycle()
+    val goalWarning by viewModel.goalWarning.collectAsStateWithLifecycle()
 
     var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
     var goals by remember { mutableStateOf<List<Goal>>(emptyList()) }
@@ -79,6 +81,60 @@ fun AddExpenseScreen(
                 )
             }
         )
+    }
+    if (showBudgetWarning) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissBudgetWarning() },
+            containerColor = Color.White,
+            title = { Text(stringResource(R.string.budget_exceeded_title)) },
+            text = { Text(stringResource(R.string.budget_exceeded_message)) },
+            confirmButton = {
+                DialogConfirmButton(
+                    text = stringResource(R.string.budget_exceeded_confirm),
+                    onClick = { viewModel.confirmSaveOverBudget() }
+                )
+            },
+            dismissButton = {
+                DialogDismissButton(
+                    text = stringResource(R.string.action_cancel),
+                    onClick = { viewModel.dismissBudgetWarning() }
+                )
+            }
+        )
+    }
+
+    when (val warning = goalWarning) {
+        is GoalTransferWarning.Overflow -> AlertDialog(
+            onDismissRequest = { viewModel.dismissGoalWarning() },
+            containerColor = Color.White,
+            title = { Text(stringResource(R.string.goal_overflow_title)) },
+            text = { Text(stringResource(R.string.goal_overflow_message, warning.remaining.toPlainString())) },
+            confirmButton = {
+                DialogConfirmButton(
+                    text = stringResource(R.string.goal_overflow_confirm, warning.remaining.toPlainString()),
+                    onClick = { viewModel.confirmSaveCappedToGoal() }
+                )
+            },
+            dismissButton = {
+                DialogDismissButton(
+                    text = stringResource(R.string.action_cancel),
+                    onClick = { viewModel.dismissGoalWarning() }
+                )
+            }
+        )
+        GoalTransferWarning.AlreadyReached -> AlertDialog(
+            onDismissRequest = { viewModel.dismissGoalWarning() },
+            containerColor = Color.White,
+            title = { Text(stringResource(R.string.goal_reached_title)) },
+            text = { Text(stringResource(R.string.goal_reached_message)) },
+            confirmButton = {
+                DialogConfirmButton(
+                    text = stringResource(R.string.action_ok),
+                    onClick = { viewModel.dismissGoalWarning() }
+                )
+            }
+        )
+        null -> {}
     }
 
     Scaffold(

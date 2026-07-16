@@ -9,9 +9,12 @@ import com.example.personalexpensemanager.domain.Transaction
 import com.example.personalexpensemanager.domain.TransactionHelper
 import com.example.personalexpensemanager.domain.TransactionHelper.calculateTotalExpenses
 import com.example.personalexpensemanager.domain.enums.TransactionType
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -29,6 +32,9 @@ class DashboardViewModel(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
+    private val _snackbarEvent = MutableSharedFlow<Int>()
+    val snackbarEvent: SharedFlow<Int> = _snackbarEvent.asSharedFlow()
 
     val uiState: StateFlow<IDashboardUIState> = retrySignal.flatMapLatest {
         combine(
@@ -63,23 +69,18 @@ class DashboardViewModel(
     private fun calculateCategoriesPercentage(
         categories: List<Category>,
         transactions: List<Transaction>
-    ): HashMap<Category, Float> {
-        val categoriesMap = HashMap<Category, Float>()
+    ): Map<Category, Float> {
         val totalExpensesAmount = calculateTotalExpenses(transactions)
-        for (category in categories) {
-            var categoryTotalAmount: Float = 0.0f
-            for (transaction in transactions) {
-                if (category.id == transaction.categoryId && transaction.type == TransactionType.EXPENSE) {
-                    categoryTotalAmount += transaction.amount.toFloat()
-                }
-            }
-            categoriesMap[category] = if (totalExpensesAmount > BigDecimal.ZERO) {
+        return categories.associateWith { category ->
+            val categoryTotalAmount = transactions
+                .filter { it.categoryId == category.id && it.type == TransactionType.EXPENSE }
+                .fold(0f) { acc, t -> acc + t.amount.toFloat() }
+            if (totalExpensesAmount > BigDecimal.ZERO) {
                 categoryTotalAmount / totalExpensesAmount.toFloat()
             } else {
                 0f
             }
         }
-        return categoriesMap
     }
 
     fun refresh() {
@@ -92,7 +93,8 @@ class DashboardViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-            } finally {
+            _snackbarEvent.emit(R.string.error_load_dashboard)
+        } finally {
                 _isRefreshing.value = false
             }
         }

@@ -80,9 +80,8 @@ fun CategoriesScreen(
         onDelete = viewModel::deleteCategory,
         onRetry = viewModel::retry,
         onNameChanged = viewModel::onNameChanged,
-        onNameFieldTouched = viewModel::onNameFieldTouched,
         onIconSelected = viewModel::onIconSelected,
-        onIconTouched = viewModel::onIconTouched,
+        onSubmitAttempted = viewModel::onSubmitAttempted,
         onStartEditing = viewModel::startEditing,
         onCategoryAdded = onCategoryAdded
     )
@@ -99,9 +98,8 @@ fun CategoriesContent(
     onDelete: (categoryId: String) -> Unit,
     onRetry: () -> Unit = {},
     onNameChanged: (String) -> Unit,
-    onNameFieldTouched: () -> Unit,
     onIconSelected: (String) -> Unit,
-    onIconTouched: () -> Unit,
+    onSubmitAttempted: () -> Unit,
     onStartEditing: (Category?) -> Unit,
     onCategoryAdded: (() -> Unit)? = null
 ){
@@ -207,12 +205,11 @@ fun CategoriesContent(
             title = stringResource(R.string.categories_add_title),
             initial = null,
             nameErrorResId = formErrors.nameErrorResId,
-            nameTouched = formErrors.nameTouched,
             iconErrorResId = formErrors.iconErrorResId,
+            submitted = formErrors.submitted,
             onNameChanged = onNameChanged,
-            onNameFieldTouched = onNameFieldTouched,
             onIconSelected = onIconSelected,
-            onIconTouched = onIconTouched,
+            onSubmitAttempted = onSubmitAttempted,
             onConfirm = { name, icon ->
                 onAdd(name, icon)
                 showAddDialog = false
@@ -227,12 +224,11 @@ fun CategoriesContent(
             title = stringResource(R.string.categories_edit_title),
             initial = category,
             nameErrorResId = formErrors.nameErrorResId,
-            nameTouched = formErrors.nameTouched,
             iconErrorResId = formErrors.iconErrorResId,
+            submitted = formErrors.submitted,
             onNameChanged = onNameChanged,
-            onNameFieldTouched = onNameFieldTouched,
             onIconSelected = onIconSelected,
-            onIconTouched = onIconTouched,
+            onSubmitAttempted = onSubmitAttempted,
             onConfirm = { name, icon -> onUpdate(category.copy(name = name, iconName = icon)); categoryToEdit = null },
             onDismiss = { categoryToEdit = null }
         )
@@ -270,9 +266,8 @@ fun CategoriesContentPreview() {
             onDelete = {},
             onRetry = {},
             onNameChanged = {},
-            onNameFieldTouched = {},
             onIconSelected = {},
-            onIconTouched = {},
+            onSubmitAttempted = {},
             onStartEditing = {},
         )
 

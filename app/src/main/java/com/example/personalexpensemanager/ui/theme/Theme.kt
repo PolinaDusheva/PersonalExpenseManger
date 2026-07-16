@@ -34,8 +34,6 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
-val GradientStart = Color(0xFF3F5EFB)
-val GradientEnd = Color(0xFFD859FF)
 object GradientGraphics {
     val primaryHorizontal = Brush.horizontalGradient(
         colors = listOf(GradientStart, GradientEnd)

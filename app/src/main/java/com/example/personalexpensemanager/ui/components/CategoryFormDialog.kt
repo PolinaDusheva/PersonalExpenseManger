@@ -11,20 +11,18 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
+import com.example.personalexpensemanager.ui.addExpense.components.TextField
 import com.example.personalexpensemanager.ui.components.appButtons.DialogConfirmButton
 import com.example.personalexpensemanager.ui.components.appButtons.DialogDismissButton
 
@@ -33,18 +31,16 @@ fun CategoryFormDialog(
     title: String,
     initial: Category?,
     nameErrorResId: Int?,
-    nameTouched: Boolean,
     iconErrorResId: Int?,
+    submitted: Boolean,
     onNameChanged: (String) -> Unit,
-    onNameFieldTouched: () -> Unit,
-    onIconTouched: () -> Unit,
     onIconSelected: (String) -> Unit,
+    onSubmitAttempted: () -> Unit,
     onConfirm: (name: String, icon: String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
     var icon by remember { mutableStateOf(initial?.iconName ?: "") }
-    var wasFocused by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -57,24 +53,15 @@ fun CategoryFormDialog(
                     .heightIn(max = dimensionResource(R.dimen.category_dialog_max_height))
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(
+                TextField(
                     value = name,
                     onValueChange = {
                         name = it
                         onNameChanged(it)
                     },
-                    label = { Text(stringResource(R.string.category_name_label)) },
-                    isError = nameTouched && nameErrorResId != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { focusState ->
-                            if (wasFocused && !focusState.isFocused) {
-                                onNameFieldTouched()
-                            }
-                            wasFocused = focusState.isFocused
-                        }
+                    label = stringResource(R.string.category_name_label)
                 )
-                if (nameTouched && nameErrorResId != null) {
+                if (submitted && nameErrorResId != null) {
                     Text(
                         text = stringResource(nameErrorResId),
                         color = MaterialTheme.colorScheme.error,
@@ -93,7 +80,7 @@ fun CategoryFormDialog(
                         onIconSelected(it)
                     }
                 )
-                if (iconErrorResId != null) {
+                if (submitted && iconErrorResId != null) {
                     Text(
                         text = stringResource(iconErrorResId),
                         color = MaterialTheme.colorScheme.error,
@@ -105,8 +92,7 @@ fun CategoryFormDialog(
         confirmButton = {
             DialogConfirmButton(text = stringResource(R.string.category_save), onClick = {
                 if (nameErrorResId != null || iconErrorResId != null) {
-                    onNameFieldTouched()
-                    onIconTouched()
+                    onSubmitAttempted()
                 } else {
                     onConfirm(name, icon)
                 }

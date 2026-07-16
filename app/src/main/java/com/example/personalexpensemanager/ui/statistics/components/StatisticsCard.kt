@@ -19,6 +19,10 @@ import androidx.compose.ui.unit.sp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
+import com.example.personalexpensemanager.ui.theme.TextPrimary
+import com.example.personalexpensemanager.ui.theme.TextSecondary
+
+private val LABEL_LETTER_SPACING = 1.sp
 
 @Composable
 fun StatisticsCard(
@@ -37,9 +41,9 @@ fun StatisticsCard(
     } else {
         Modifier.background(Color.White, shape)
     }
-    val labelColor = if (highlighted) Color.White.copy(alpha = 0.8f) else Color(0xFF6B7280)
-    val valueColor = if (highlighted) Color.White else Color(0xFF1F2937)
-    val subtitleColor = if (highlighted) Color.White.copy(alpha = 0.8f) else Color(0xFF6B7280)
+    val labelColor = if (highlighted) Color.White else TextSecondary
+    val valueColor = if (highlighted) Color.White else TextPrimary
+    val subtitleColor = if (highlighted) Color.White else TextSecondary
 
     Column(
         modifier = modifier
@@ -49,15 +53,14 @@ fun StatisticsCard(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = labelColor,
-            letterSpacing = 1.sp
+            letterSpacing = LABEL_LETTER_SPACING
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.statistics_card_spacing)))
         Text(
             text = value,
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
             color = valueColor
         )
         if (subtitle != null) {

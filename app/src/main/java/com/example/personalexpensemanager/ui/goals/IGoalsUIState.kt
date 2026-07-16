@@ -10,7 +10,8 @@ sealed interface IGoalsUIState {
         val monthlyBudget: BigDecimal?,
         val totalSpentThisMonth: BigDecimal,
         val dailyLimit: BigDecimal?,
-        val totalSpentToday: BigDecimal
+        val totalSpentToday: BigDecimal,
+        val totalSavings: BigDecimal
     ) : IGoalsUIState
     data class Error(val messageResId: Int) : IGoalsUIState
 

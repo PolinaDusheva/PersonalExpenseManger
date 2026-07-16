@@ -15,14 +15,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,14 +40,18 @@ import com.example.personalexpensemanager.domain.Transaction
 import com.example.personalexpensemanager.domain.enums.Currency
 import com.example.personalexpensemanager.domain.enums.PaymentMethod
 import com.example.personalexpensemanager.domain.enums.TransactionType
+import com.example.personalexpensemanager.ui.components.AppSnackbarHost
 import com.example.personalexpensemanager.ui.components.CategoryItem
 import com.example.personalexpensemanager.ui.components.ErrorScreen
 import com.example.personalexpensemanager.ui.components.Headline
 import com.example.personalexpensemanager.ui.components.SummaryCard
 import com.example.personalexpensemanager.ui.components.TransactionItem
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
+import com.example.personalexpensemanager.ui.theme.TextSecondary
 import java.math.BigDecimal
 import java.time.LocalDate
+
+private val NO_CORNER_RADIUS = 0.dp
 
 @Composable
 fun DashboardScreen(
@@ -51,14 +60,29 @@ fun DashboardScreen(
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing = viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
-    DashboardContent(
-        state.value,
-        isRefreshing = isRefreshing.value,
-        onRefresh = viewModel::refresh,
-        onRetry = viewModel::retry,
-        onTransactionClick = onTransactionClick
-    )
+    LaunchedEffect(Unit) {
+        viewModel.snackbarEvent.collect { resId ->
+            snackbarHostState.showSnackbar(context.getString(resId))
+        }
+    }
+
+    Scaffold(
+        containerColor = Color.White,
+        snackbarHost = { AppSnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            DashboardContent(
+                state.value,
+                isRefreshing = isRefreshing.value,
+                onRefresh = viewModel::refresh,
+                onRetry = viewModel::retry,
+                onTransactionClick = onTransactionClick
+            )
+        }
+    }
 }
 
 @Composable
@@ -181,7 +205,7 @@ fun EmptyScreen(
                             Text(
                                 text = stringResource(R.string.dashboard_no_transactions),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
+                                color = TextSecondary
                             )
                         }
                     }
@@ -204,7 +228,7 @@ fun EmptyScreen(
                     Text(
                         text = stringResource(R.string.dashboard_no_categories),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
+                        color = TextSecondary,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
@@ -221,7 +245,7 @@ fun EmptyScreen(
 @Composable
 fun SuccessScreen(
     transactions: List<Transaction>,
-    categoriesMap: HashMap<Category, Float>,
+    categoriesMap: Map<Category, Float>,
     categoriesById: Map<String, Category>,
     totalAmount: BigDecimal,
     biggestExpense: BigDecimal,
@@ -308,10 +332,10 @@ fun SuccessScreen(
                     val isFirst = transaction.id == transactions.first().id
                     val isLast = transaction.id == transactions.last().id
                     val shape = RoundedCornerShape(
-                        topStart = if (isFirst) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp,
-                        topEnd = if (isFirst) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp,
-                        bottomStart = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp,
-                        bottomEnd = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else 0.dp
+                        topStart = if (isFirst) dimensionResource(R.dimen.transaction_card_corner_radius) else NO_CORNER_RADIUS,
+                        topEnd = if (isFirst) dimensionResource(R.dimen.transaction_card_corner_radius) else NO_CORNER_RADIUS,
+                        bottomStart = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else NO_CORNER_RADIUS,
+                        bottomEnd = if (isLast) dimensionResource(R.dimen.transaction_card_corner_radius) else NO_CORNER_RADIUS
                     )
                     Surface(
                         onClick = { onTransactionClick(transaction.id) },
@@ -367,7 +391,7 @@ fun SuccessScreen(
                                 Text(
                                     text = stringResource(R.string.dashboard_no_categories),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Gray
+                                    color = TextSecondary
                                 )
                             }
                         }

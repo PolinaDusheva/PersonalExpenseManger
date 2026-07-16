@@ -65,105 +65,50 @@ class StatisticsViewModel(
         _selectedPeriod.value = period
     }
 
-    private fun filterExpenses(transactions: List<Transaction>): List<Transaction> {
-        val expenses = mutableListOf<Transaction>()
-        for (transaction in transactions) {
-            if (transaction.type == TransactionType.EXPENSE) {
-                expenses.add(transaction)
-            }
-        }
-        return expenses
-    }
+    private fun filterExpenses(transactions: List<Transaction>): List<Transaction> =
+        transactions.filter { it.type == TransactionType.EXPENSE }
 
     private fun filterByPeriod(
         expenses: List<Transaction>,
         period: Period
-    ): List<Transaction> {
-        val result = mutableListOf<Transaction>()
-        for (expense in expenses) {
-            if (!expense.date.isBefore(period.start) && !expense.date.isAfter(period.end)) {
-                result.add(expense)
-            }
-        }
-        return result
-    }
+    ): List<Transaction> =
+        expenses.filter { !it.date.isBefore(period.start) && !it.date.isAfter(period.end) }
 
-    private fun calculateCurrentMonthTotal(expenses: List<Transaction>): BigDecimal {
-        val now = LocalDate.now()
-        var total = BigDecimal.ZERO
-        for (expense in expenses) {
-            if (expense.date.year == now.year && expense.date.month == now.month) {
-                total += expense.amount
-            }
-        }
-        return total
-    }
-
-    private fun calculateTotal(expenses: List<Transaction>): BigDecimal {
-        var total = BigDecimal.ZERO
-        for (expense in expenses) {
-            total += expense.amount
-        }
-        return total
-    }
+    private fun calculateTotal(expenses: List<Transaction>): BigDecimal =
+        expenses.fold(BigDecimal.ZERO) { acc, e -> acc + e.amount }
 
     private fun calculateDailySpending(
         expenses: List<Transaction>,
         period: Period
     ): List<IStatisticsUIState.DailySpend> {
         val days = ChronoUnit.DAYS.between(period.start, period.end).toInt()
-        val result = mutableListOf<IStatisticsUIState.DailySpend>()
-
-        for (offset in 0..days) {
+        return (0..days).map { offset ->
             val date = period.start.plusDays(offset.toLong())
-            var dayTotal = BigDecimal.ZERO
-            val dayTitles = mutableListOf<String>()
-            for (expense in expenses) {
-                if (expense.date == date) {
-                    dayTotal += expense.amount
-                    dayTitles.add(expense.title)
-                }
-            }
-            result.add(IStatisticsUIState.DailySpend(date = date, amount = dayTotal, titles = dayTitles))
+            val expensesForDay = expenses.filter { it.date == date }
+            IStatisticsUIState.DailySpend(
+                date = date,
+                amount = expensesForDay.fold(BigDecimal.ZERO) { acc, e -> acc + e.amount },
+                titles = expensesForDay.map { it.title }
+            )
         }
-        return result
     }
 
     private fun calculateCategoryTotals(
         expenses: List<Transaction>,
         categories: List<Category>
-    ): List<IStatisticsUIState.CategorySpend> {
-        val result = mutableListOf<IStatisticsUIState.CategorySpend>()
+    ): List<IStatisticsUIState.CategorySpend> =
+        categories
+            .map { category ->
+                val total = expenses
+                    .filter { it.categoryId == category.id }
+                    .fold(BigDecimal.ZERO) { acc, e -> acc + e.amount }
+                IStatisticsUIState.CategorySpend(categoryName = category.name, amount = total)
+            }
+            .filter { it.amount > BigDecimal.ZERO }
+            .sortedByDescending { it.amount }
 
-        for (category in categories) {
-            var categoryTotal = BigDecimal.ZERO
-            for (expense in expenses) {
-                if (expense.categoryId == category.id) {
-                    categoryTotal += expense.amount
-                }
-            }
-            if (categoryTotal > BigDecimal.ZERO) {
-                result.add(
-                    IStatisticsUIState.CategorySpend(
-                        categoryName = category.name,
-                        amount = categoryTotal
-                    )
-                )
-            }
-        }
-        result.sortByDescending { it.amount }
-        return result
-    }
-
-    private fun findBiggestExpense(expenses: List<Transaction>): Transaction? {
-        var biggest: Transaction? = null
-        for (expense in expenses) {
-            if (biggest == null || expense.amount > biggest.amount) {
-                biggest = expense
-            }
-        }
-        return biggest
-    }
+    private fun findBiggestExpense(expenses: List<Transaction>): Transaction? =
+        expenses.maxByOrNull { it.amount }
 
     private fun calculateAverageDaily(
         expenses: List<Transaction>,
@@ -172,10 +117,7 @@ class StatisticsViewModel(
         val days = ChronoUnit.DAYS.between(period.start, period.end) + 1
         if (days <= 0) return BigDecimal.ZERO
 
-        var total = BigDecimal.ZERO
-        for (expense in expenses) {
-            total += expense.amount
-        }
+        val total = expenses.fold(BigDecimal.ZERO) { acc, e -> acc + e.amount }
         return total.divide(BigDecimal(days), 2, RoundingMode.HALF_UP)
     }
 }

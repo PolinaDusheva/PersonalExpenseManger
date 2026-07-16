@@ -54,6 +54,7 @@ import com.example.personalexpensemanager.ui.goals.components.SetBudgetDialog
 import com.example.personalexpensemanager.ui.goals.components.MonthlyExpenseArc
 import com.example.personalexpensemanager.ui.goals.components.SetDailyLimitDialog
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
+import com.example.personalexpensemanager.ui.theme.TextSecondary
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -103,9 +104,7 @@ fun GoalsScreen(
         AddGoalDialog(
             formErrors = formErrors.value,
             onTitleChanged = viewModel::onGoalTitleChanged,
-            onTitleTouched = viewModel::onGoalTitleTouched,
             onAmountChanged = viewModel::onGoalAmountChanged,
-            onAmountTouched = viewModel::onGoalAmountTouched,
             onConfirm = { title, amount, deadline ->
                 if (viewModel.addGoal(title, amount, deadline)) {
                     showAddDialog = false
@@ -121,9 +120,7 @@ fun GoalsScreen(
             formErrors = formErrors.value,
             editingGoal = editingGoal,
             onTitleChanged = viewModel::onGoalTitleChanged,
-            onTitleTouched = viewModel::onGoalTitleTouched,
             onAmountChanged = viewModel::onGoalAmountChanged,
-            onAmountTouched = viewModel::onGoalAmountTouched,
             onConfirm = { title, amount, deadline ->
                 if (viewModel.updateGoal(editingGoal!!.id, title, amount, deadline)) {
                     editingGoal = null
@@ -179,7 +176,6 @@ fun GoalsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
                 .padding(top = dimensionResource(R.dimen.padding_small))
         ) {
         Row(
@@ -251,13 +247,15 @@ fun GoalsContent(
                             icon = Icons.Filled.Speed,
                             label = stringResource(R.string.goal_daily_limit),
                             onClick = onDailyLimitClick,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            subtitle = state.dailyLimit?.let { "${it.toPlainString()}€" }
                         )
                         GoalActionButton(
                             icon = Icons.Filled.Savings,
                             label = stringResource(R.string.goal_savings),
                             onClick = onSavingsClick,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            subtitle = if (state.totalSavings > BigDecimal.ZERO) "${state.totalSavings.toPlainString()}€" else null
                         )
                     }
 
@@ -266,7 +264,7 @@ fun GoalsContent(
                     if (state.goals.isEmpty()) {
                         Text(
                             text = stringResource(R.string.goals_empty_state),
-                            color = Color.Gray,
+                            color = TextSecondary,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = dimensionResource(R.dimen.padding_standard))
@@ -307,7 +305,8 @@ fun GoalsScreenPreview() {
                 monthlyBudget = BigDecimal("1500.00"),
                 totalSpentThisMonth = BigDecimal("620.00"),
                 dailyLimit = BigDecimal("50.00"),
-                totalSpentToday = BigDecimal("30.00")
+                totalSpentToday = BigDecimal("30.00"),
+                totalSavings = BigDecimal("2500.00")
             )
         )
     }

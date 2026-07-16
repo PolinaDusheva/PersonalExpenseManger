@@ -28,6 +28,8 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 
+private const val CATEGORY_CARD_ASPECT_RATIO = 1.6f
+
 @Composable
 fun CategoryCard(
     category: Category,
@@ -40,7 +42,7 @@ fun CategoryCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1.6f)
+            .aspectRatio(CATEGORY_CARD_ASPECT_RATIO)
             .shadow(elevation = dimensionResource(R.dimen.elevation), shape = shape)
             .clip(shape)
             .background(Brush.linearGradient(gradient))
@@ -51,7 +53,7 @@ fun CategoryCard(
         Icon(
             imageVector = categoryIconFilled(category.iconName),
             contentDescription = null,
-            tint = colorResource(R.color.white),
+            tint = Color.White,
             modifier = Modifier
                 .size(dimensionResource(R.dimen.category_card_icon_size))
                 .align(Alignment.TopEnd)
@@ -60,7 +62,7 @@ fun CategoryCard(
         Icon(
             imageVector = Icons.Filled.Delete,
             contentDescription = stringResource(R.string.category_delete),
-            tint = colorResource(R.color.white),
+            tint = Color.White,
             modifier = Modifier
                 .size(dimensionResource(R.dimen.category_card_delete_icon_size))
                 .align(Alignment.BottomEnd)
@@ -68,7 +70,7 @@ fun CategoryCard(
         )
         Text(
             text = category.name,
-            color = colorResource(R.color.white),
+            color = Color.White,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(Alignment.BottomStart)
         )

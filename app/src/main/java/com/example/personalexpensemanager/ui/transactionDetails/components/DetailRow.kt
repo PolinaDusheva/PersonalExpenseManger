@@ -16,6 +16,6 @@ fun DetailRow(label: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value, fontWeight = FontWeight.Medium)
+        Text(value, style = MaterialTheme.typography.titleMedium)
     }
 }

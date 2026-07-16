@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.components.ErrorScreen
 import com.example.personalexpensemanager.ui.components.Headline
+import com.example.personalexpensemanager.ui.components.appButtons.GradientIconButton
 import com.example.personalexpensemanager.ui.statistics.components.PeriodFilter
 import com.example.personalexpensemanager.ui.statistics.components.CategoryBarChart
 import com.example.personalexpensemanager.ui.statistics.components.ExpenseLineChart
@@ -39,12 +44,16 @@ import java.text.DecimalFormat
 import java.time.LocalDate
 
 @Composable
-fun StatisticsScreen(viewModel: StatisticsViewModel) {
+fun StatisticsScreen(
+    viewModel: StatisticsViewModel,
+    onBack: () -> Unit = {}
+) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
     StatisticsContent(
         state = state.value,
         onPeriodSelected = viewModel::onPeriodSelected,
-        onRetry = viewModel::retry
+        onRetry = viewModel::retry,
+        onBack = onBack
     )
 }
 
@@ -52,7 +61,8 @@ fun StatisticsScreen(viewModel: StatisticsViewModel) {
 fun StatisticsContent(
     state: IStatisticsUIState,
     onPeriodSelected: (Period) -> Unit = {},
-    onRetry: () -> Unit = {}
+    onRetry: () -> Unit = {},
+    onBack: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -61,8 +71,20 @@ fun StatisticsContent(
             .statusBarsPadding()
             .padding(top = dimensionResource(R.dimen.padding_small))
     ) {
-        Column(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_horizontal))) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GradientIconButton(
+                icon = Icons.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.action_close),
+                onClick = onBack
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
             Headline(text = stringResource(R.string.statistics_title))
+
         }
 
         when (state) {
@@ -93,6 +115,7 @@ fun StatisticsContent(
                         .padding(horizontal = dimensionResource(R.dimen.padding_horizontal)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_standard))
                 ) {
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_standard)))
                     Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
                         StatisticsCard(
                             label = stringResource(R.string.statistics_spent_this_month),

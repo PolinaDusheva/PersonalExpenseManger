@@ -18,22 +18,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.statistics.IStatisticsUIState.CategorySpend
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
+import com.example.personalexpensemanager.ui.theme.TextPrimary
+import com.example.personalexpensemanager.ui.theme.TextSecondary
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.res.stringResource
+
+private const val BAR_MAX_HEIGHT = 130
+private val BAR_MIN_HEIGHT = 4.dp
 
 @Composable
 fun CategoryBarChart(
@@ -54,7 +57,7 @@ fun CategoryBarChart(
             Text(
                 text = stringResource(R.string.dashboard_no_categories),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
+                color = TextSecondary,
                 textAlign = TextAlign.Center
             )
         }
@@ -83,8 +86,8 @@ fun CategoryBarChart(
             ) {
                 Text(
                     text = formatShort(category.amount),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF6B7280)
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.statistics_card_spacing)))
                 Column(
@@ -97,7 +100,7 @@ fun CategoryBarChart(
                     Spacer(
                         modifier = Modifier
                             .width(dimensionResource(R.dimen.bar_chart_bar_width))
-                            .height((130 * fraction).dp.coerceAtLeast(4.dp))
+                            .height((BAR_MAX_HEIGHT * fraction).dp.coerceAtLeast(BAR_MIN_HEIGHT))
                             .background(
                                 brush = barBrush,
                                 shape = RoundedCornerShape(
@@ -110,10 +113,8 @@ fun CategoryBarChart(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 Text(
                     text = category.categoryName,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 11.sp,
-                    color = Color(0xFF1F2937),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center

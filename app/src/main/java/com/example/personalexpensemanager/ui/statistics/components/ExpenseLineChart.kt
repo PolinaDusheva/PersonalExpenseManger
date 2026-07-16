@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,12 +36,21 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.statistics.IStatisticsUIState.DailySpend
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
+import com.example.personalexpensemanager.ui.theme.TextPrimary
+import com.example.personalexpensemanager.ui.theme.TextSecondary
+import com.example.personalexpensemanager.ui.theme.ChartGridLine
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
+
+private const val CHART_HEIGHT_FRACTION = 0.85f
+private val CHART_LINE_WIDTH = 4.dp
+private val CHART_GRID_WIDTH = 1.dp
+private val SELECTED_POINT_GLOW_RADIUS = 18.dp
+private val SELECTED_POINT_RADIUS = 8.dp
 
 @Composable
 fun ExpenseLineChart(
@@ -77,7 +85,7 @@ fun ExpenseLineChart(
                     }
                 },
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF6B7280),
+                color = TextSecondary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
@@ -86,8 +94,7 @@ fun ExpenseLineChart(
             Text(
                 text = formatAmount(selected.amount),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1F2937)
+                color = TextPrimary
             )
         }
 
@@ -120,16 +127,16 @@ fun ExpenseLineChart(
             val points = dailySpending.mapIndexed { i, day ->
                 Offset(
                     x = if (dailySpending.size > 1) i * stepX else size.width / 2,
-                    y = size.height - (day.amount.toFloat() / maxAmount) * size.height * 0.85f
+                    y = size.height - (day.amount.toFloat() / maxAmount) * size.height * CHART_HEIGHT_FRACTION
                 )
             }
 
             points.forEach { point ->
                 drawLine(
-                    color = Color(0xFFE3DEF0),
+                    color = ChartGridLine,
                     start = Offset(point.x, 0f),
                     end = Offset(point.x, size.height),
-                    strokeWidth = 1.dp.toPx()
+                    strokeWidth = CHART_GRID_WIDTH.toPx()
                 )
             }
 
@@ -146,18 +153,18 @@ fun ExpenseLineChart(
             drawPath(
                 path = path,
                 brush = Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
-                style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
+                style = Stroke(width = CHART_LINE_WIDTH.toPx(), cap = StrokeCap.Round)
             )
 
             val selectedPoint = points[selectedIndex]
             drawCircle(
                 color = GradientStart.copy(alpha = 0.25f),
-                radius = 18.dp.toPx(),
+                radius = SELECTED_POINT_GLOW_RADIUS.toPx(),
                 center = selectedPoint
             )
             drawCircle(
                 brush = Brush.linearGradient(listOf(GradientStart, GradientEnd)),
-                radius = 8.dp.toPx(),
+                radius = SELECTED_POINT_RADIUS.toPx(),
                 center = selectedPoint
             )
         }

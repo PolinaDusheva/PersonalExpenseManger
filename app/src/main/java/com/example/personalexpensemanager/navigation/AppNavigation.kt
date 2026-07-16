@@ -161,7 +161,10 @@ fun AppNavigation() {
             }
             composable(Screen.Statistics.route) {
                 val viewModel: StatisticsViewModel = viewModel(factory = factory)
-                StatisticsScreen(viewModel = viewModel)
+                StatisticsScreen(
+                    viewModel = viewModel,
+                    onBack = { myNavigationManager.popBackStack() }
+                )
             }
         }
     }

@@ -35,7 +35,7 @@ fun ErrorScreen(
     ) {
         Text(
             text = stringResource(messageResId),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
 

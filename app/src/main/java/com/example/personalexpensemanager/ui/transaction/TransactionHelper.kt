@@ -8,32 +8,16 @@ object TransactionHelper {
 
     fun filterCurrentMonth(transactions: List<Transaction>): List<Transaction> {
         val now = LocalDate.now()
-        val result = mutableListOf<Transaction>()
-        for (transaction in transactions) {
-            if (transaction.date.year == now.year && transaction.date.month == now.month) {
-                result.add(transaction)
-            }
-        }
-        return result
+        return transactions.filter { it.date.year == now.year && it.date.month == now.month }
     }
 
-    fun calculateTotalExpenses(transactions: List<Transaction>): BigDecimal {
-        var amount = BigDecimal.ZERO
-        for (transaction in transactions) {
-            if (transaction.type == TransactionType.EXPENSE) {
-                amount += transaction.amount
-            }
-        }
-        return amount
-    }
+    fun calculateTotalExpenses(transactions: List<Transaction>): BigDecimal =
+        transactions
+            .filter { it.type == TransactionType.EXPENSE }
+            .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
 
-    fun calculateBiggestExpense(transactions: List<Transaction>): BigDecimal {
-        var maxExpense = BigDecimal.ZERO
-        for (transaction in transactions) {
-            if (transaction.type == TransactionType.EXPENSE && transaction.amount > maxExpense) {
-                maxExpense = transaction.amount
-            }
-        }
-        return maxExpense
-    }
+    fun calculateBiggestExpense(transactions: List<Transaction>): BigDecimal =
+        transactions
+            .filter { it.type == TransactionType.EXPENSE }
+            .maxOfOrNull { it.amount } ?: BigDecimal.ZERO
 }

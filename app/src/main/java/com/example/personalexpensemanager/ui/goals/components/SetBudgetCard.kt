@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
 import com.example.personalexpensemanager.ui.theme.GradientStart
@@ -52,7 +51,7 @@ fun SetBudgetCard(
             )
             .clickable { onClick() },
         shape = RoundedCornerShape(dimensionResource(R.dimen.statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.elevation)),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Row(

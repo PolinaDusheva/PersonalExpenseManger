@@ -27,7 +27,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.YearMonth
 import java.util.UUID
+
+sealed interface GoalTransferWarning {
+    data class Overflow(val remaining: BigDecimal) : GoalTransferWarning
+    data object AlreadyReached : GoalTransferWarning
+}
 
 class AddExpenseViewModel(
     private val dataService: IExpenseDataService,
@@ -50,6 +56,12 @@ class AddExpenseViewModel(
 
     private val _showDailyLimitWarning = MutableStateFlow(false)
     val showDailyLimitWarning: StateFlow<Boolean> = _showDailyLimitWarning.asStateFlow()
+
+    private val _showBudgetWarning = MutableStateFlow(false)
+    val showBudgetWarning: StateFlow<Boolean> = _showBudgetWarning.asStateFlow()
+
+    private val _goalWarning = MutableStateFlow<GoalTransferWarning?>(null)
+    val goalWarning: StateFlow<GoalTransferWarning?> = _goalWarning.asStateFlow()
 
     val isEditMode: Boolean get() = editTransactionId != null
 
@@ -121,20 +133,17 @@ class AddExpenseViewModel(
     }
 
     override fun onTitleChanged(value: String) { _formState.update { it.copy(title = value) } }
-    override fun onTitleTouched() { _formErrors.update { it.copy(titleTouched = true) } }
     override fun onAmountChanged(value: String) { _formState.update { it.copy(amount = value) } }
-    override fun onAmountTouched() { _formErrors.update { it.copy(amountTouched = true) } }
     override fun onDescriptionChanged(value: String) { _formState.update { it.copy(description = value) } }
-    override fun onDescriptionTouched() { _formErrors.update { it.copy(descriptionTouched = true) } }
 
     override fun onDateSelected(date: LocalDate?) {
         _formState.update { it.copy(date = date) }
-        _formErrors.update { it.copy(dateErrorResId = required(date, R.string.validation_date_required), dateTouched = true) }
+        _formErrors.update { it.copy(dateErrorResId = required(date, R.string.validation_date_required)) }
     }
 
     override fun onCategorySelected(categoryId: String?) {
         _formState.update { it.copy(selectedCategoryId = categoryId) }
-        _formErrors.update { it.copy(categoryErrorResId = null, categoryTouched = true) }
+        _formErrors.update { it.copy(categoryErrorResId = null) }
     }
 
     override fun onGoalSelected(goalId: String?) { _formState.update { it.copy(selectedGoalId = goalId) } }
@@ -145,23 +154,26 @@ class AddExpenseViewModel(
     override fun onSave() {
         val form = _formState.value
         if (!validateForm(form)) return
-
-        if (isDailyLimitExceeded(form)) {
-            _showDailyLimitWarning.value = true
-            return
-        }
-
+        if (isDailyLimitExceeded(form)) { _showDailyLimitWarning.value = true; return }
+        if (isMonthlyBudgetExceeded(form)) { _showBudgetWarning.value = true; return }
+        val warning = goalTransferWarning(form)
+        if (warning != null) { _goalWarning.value = warning; return }
         performSave(form)
     }
 
     fun confirmSaveOverLimit() {
         _showDailyLimitWarning.value = false
-        performSave(_formState.value)
+        val form = _formState.value
+        if (isMonthlyBudgetExceeded(form)) { _showBudgetWarning.value = true; return }
+        performSave(form)
     }
 
-    fun dismissLimitWarning() {
-        _showDailyLimitWarning.value = false
+    fun confirmSaveOverBudget() {
+        _showBudgetWarning.value = false
+        performSave(_formState.value)
     }
+    fun dismissBudgetWarning() { _showBudgetWarning.value = false }
+    fun dismissLimitWarning() { _showDailyLimitWarning.value = false }
 
     private fun isDailyLimitExceeded(form: AddExpenseFormState): Boolean {
         if (form.transactionType != TransactionType.EXPENSE || editTransactionId != null) return false
@@ -178,6 +190,46 @@ class AddExpenseViewModel(
         return todayTotal > dailyLimit
     }
 
+    private fun isMonthlyBudgetExceeded(form: AddExpenseFormState): Boolean {
+        if (form.transactionType != TransactionType.EXPENSE || editTransactionId != null) return false
+        val budget = dataService.monthlyBudget.value ?: return false
+        val amount = form.amount.toBigDecimalOrNull() ?: return false
+        val month = YearMonth.from(form.date)
+        val monthTotal = dataService.transactions.value
+            .filter { it.type == TransactionType.EXPENSE && YearMonth.from(it.date) == month }
+            .fold(amount) { acc, t -> acc + t.amount }
+        return monthTotal > budget
+    }
+
+    private fun remainingForGoal(goalId: String): BigDecimal? {
+        val goal = dataService.goals.value.find { it.id == goalId } ?: return null
+        val saved = dataService.transactions.value
+            .filter { it.type == TransactionType.TRANSFER && it.goalId == goalId }
+            .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
+        return goal.targetAmount - saved
+    }
+
+    private fun goalTransferWarning(form: AddExpenseFormState): GoalTransferWarning? {
+        if (form.transactionType != TransactionType.TRANSFER || editTransactionId != null) return null
+        val goalId = form.selectedGoalId ?: return null
+        val amount = form.amount.toBigDecimalOrNull() ?: return null
+        val remaining = remainingForGoal(goalId) ?: return null
+        return when {
+            remaining <= BigDecimal.ZERO -> GoalTransferWarning.AlreadyReached
+            amount > remaining -> GoalTransferWarning.Overflow(remaining)
+            else -> null
+        }
+    }
+
+    fun confirmSaveCappedToGoal() {
+        val warning = _goalWarning.value
+        if (warning is GoalTransferWarning.Overflow) {
+            _goalWarning.value = null
+            performSave(_formState.value.copy(amount = warning.remaining.toPlainString()))
+        }
+    }
+
+    fun dismissGoalWarning() { _goalWarning.value = null }
     private fun performSave(form: AddExpenseFormState) {
         viewModelScope.launch {
             _uiState.value = IAddExpenseUIState.Saving
@@ -211,8 +263,11 @@ class AddExpenseViewModel(
         }
         val descriptionError = notEmpty(form.description, R.string.validation_description_empty)
         val dateError = required(form.date, R.string.validation_date_required)
+
         val categoryError = if (form.transactionType != TransactionType.TRANSFER)
             required(categoryId, R.string.validation_category_required) else null
+        val goalError = if (form.transactionType == TransactionType.TRANSFER)
+            required(form.selectedGoalId, R.string.validation_goal_required) else null
 
         _formErrors.value = _formErrors.value.copy(
             titleErrorResId = titleError,
@@ -220,15 +275,12 @@ class AddExpenseViewModel(
             descriptionErrorResId = descriptionError,
             dateErrorResId = dateError,
             categoryErrorResId = categoryError,
-            titleTouched = true,
-            amountTouched = true,
-            descriptionTouched = true,
-            dateTouched = true,
-            categoryTouched = true
+            goalErrorResId = goalError,           // ← ново
+            submitted = true
         )
 
         return titleError == null && amountError == null && descriptionError == null
-                && dateError == null && categoryError == null
+                && dateError == null && categoryError == null && goalError == null   // ← добави goalError
     }
 
     private suspend fun saveTransaction(form: AddExpenseFormState) {

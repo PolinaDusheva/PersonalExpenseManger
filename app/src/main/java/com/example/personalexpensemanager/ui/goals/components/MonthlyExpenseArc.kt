@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.personalexpensemanager.R
@@ -27,6 +26,11 @@ import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
+
+private const val ARC_START_ANGLE = 150f
+private const val ARC_MAX_SWEEP = 240f
+private const val ARC_ASPECT_RATIO = 1.4f
+private const val ARC_CONTENT_WIDTH_FRACTION = 0.7f
 
 @Composable
 fun MonthlyExpenseArc(
@@ -51,11 +55,11 @@ fun MonthlyExpenseArc(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(1.4f)
+            .aspectRatio(ARC_ASPECT_RATIO)
     ) {
         Canvas(
             modifier = Modifier
-                .fillMaxWidth(0.7f)
+                .fillMaxWidth(ARC_CONTENT_WIDTH_FRACTION)
                 .aspectRatio(1f)
         ) {
             val strokeWidth = strokeWidthDp.toPx()
@@ -63,8 +67,8 @@ fun MonthlyExpenseArc(
             val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
             val topLeft = Offset(padding, padding)
 
-            val startAngle = 150f
-            val maxSweep = 240f
+            val startAngle = ARC_START_ANGLE
+            val maxSweep = ARC_MAX_SWEEP
 
             drawArc(
                 color = if (hasBudget) trackColor else grayTrack,
@@ -78,14 +82,7 @@ fun MonthlyExpenseArc(
 
             if (hasBudget) {
                 drawArc(
-                    brush = Brush.sweepGradient(
-                        colors = listOf(
-                            GradientStart.copy(alpha = 0.4f),
-                            GradientStart,
-                            GradientEnd,
-                            GradientEnd.copy(alpha = 0.4f)
-                        )
-                    ),
+                    brush = Brush.linearGradient(listOf(GradientStart, GradientEnd)),
                     startAngle = startAngle,
                     sweepAngle = maxSweep * progress,
                     useCenter = false,
@@ -106,13 +103,12 @@ fun MonthlyExpenseArc(
             Text(
                 text = formatAmount(totalSpent),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
                 color = amountColor
             )
             if (hasBudget) {
                 Text(
                     text = "/ ${formatAmount(budget!!)}",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = labelColor
                 )
             }

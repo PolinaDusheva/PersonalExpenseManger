@@ -27,8 +27,9 @@ class RoomExpenseDataService (
 ): IExpenseDataService{
 
     private fun randomErrorThrow(operation: String) {
-        if (Random.nextFloat() < 0.3f) {
-            throw RuntimeException("Симулирана грешка: $operation")
+        //за финалното представяне грешката е намалена до 10%
+        if (Random.nextFloat() < 0.1f) {
+            throw RuntimeException("Simulated error: $operation")
         }
     }
 
@@ -92,32 +93,33 @@ class RoomExpenseDataService (
     }
 
     override suspend fun addCategory(category: Category) {
-        randomErrorThrow("addCategory")
+        //randomErrorThrow("addCategory")
         categoryDao.upsert(category.toEntity())
     }
 
     override suspend fun updateCategory(category: Category) {
-        randomErrorThrow("updateCategory")
+        //randomErrorThrow("updateCategory")
         categoryDao.upsert(category.toEntity())
     }
 
     override suspend fun deleteCategory(categoryId: String) {
-        randomErrorThrow("deleteCategory")
+        //randomErrorThrow("deleteCategory")
         categoryDao.deleteById(categoryId)
     }
 
     override suspend fun addGoal(goal: Goal) {
-        randomErrorThrow("addGoal")
+        //randomErrorThrow("addGoal")
         goalDao.upsert(goal.toEntity())
     }
 
     override suspend fun updateGoal(goal: Goal) {
-        randomErrorThrow("updateGoal")
+        //randomErrorThrow("updateGoal")
         goalDao.upsert(goal.toEntity())
     }
 
     override suspend fun deleteGoal(goalId: String) {
         randomErrorThrow("deleteGoal")
+        transactionDao.deleteByGoalId(goalId)
         goalDao.deleteById(goalId)
     }
 

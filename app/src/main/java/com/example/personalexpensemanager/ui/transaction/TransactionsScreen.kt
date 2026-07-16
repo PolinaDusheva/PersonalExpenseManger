@@ -106,11 +106,12 @@ fun SuccessScreen(
                         onClick = { onSortSelected(SortingType.DATE) }
                     )
                     TransactionFilterChip(
-                        text = if (state.selectedPeriod != null)
-                            "${state.selectedPeriod.start} – ${state.selectedPeriod.end}"
-                        else stringResource(R.string.period_custom),
+                        text = stringResource(R.string.period_custom),
                         selected = state.selectedPeriod != null,
-                        onClick = { showRangePicker = true }
+                        onClick = {
+                            if (state.selectedPeriod != null) onPeriodSelected(null)
+                            else showRangePicker = true
+                        }
                     )
                 }
 

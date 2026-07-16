@@ -12,14 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
-
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.enums.Currency
+import com.example.personalexpensemanager.domain.enums.symbol
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
+import com.example.personalexpensemanager.ui.theme.TextPrimary
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import java.math.BigDecimal
 
@@ -40,8 +40,8 @@ fun SummaryCard(
     } else {
         Modifier.background(Color.White, shape)
     }
-    val titleColor = if (highlighted) Color.White.copy(alpha = 0.8f) else colorResource(R.color.black)
-    val amountColor = if (highlighted) Color.White else colorResource(R.color.black)
+    val titleColor = if (highlighted) Color.White else TextPrimary
+    val amountColor = if (highlighted) Color.White else TextPrimary
 
     Column(
         modifier = modifier
@@ -60,11 +60,11 @@ fun SummaryCard(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = titleColor
         )
         Text(
-            text = "$amount$currency",
+            text = "$amount${currency.symbol}",
             style = MaterialTheme.typography.titleLarge,
             color = amountColor
         )

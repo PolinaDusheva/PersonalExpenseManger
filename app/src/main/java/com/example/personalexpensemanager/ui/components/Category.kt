@@ -24,6 +24,7 @@ import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.domain.Category
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientStart
+import com.example.personalexpensemanager.ui.theme.ProgressTrackLight
 import com.example.personalexpensemanager.ui.theme.PersonalExpenseManagerTheme
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
@@ -66,7 +67,7 @@ fun CategoryItem(
                 .fillMaxWidth()
                 .height(dimensionResource(R.dimen.category_progress_height))
                 .padding(bottom = dimensionResource(R.dimen.padding_small))
-                .background(Color(0xFFE8E0F0), RoundedCornerShape(50))
+                .background(ProgressTrackLight, RoundedCornerShape(50))
         ) {
             Box(
                 modifier = Modifier

@@ -65,6 +65,7 @@
     <!-- Delete confirmation dialog -->
     <string name="delete_confirm_title">Delete</string>
     <string name="delete_confirm_message">Are you sure you want to delete “%1$s”?</string>
+    <string name="goal_delete_confirm_message">Are you sure you want to delete “%1$s”? All transfers to this goal will be deleted too.</string>
 
     <!-- Transaction details (placeholder) -->
     <string name="transaction_detail_placeholder">Transaction: %1$s</string>
@@ -106,17 +107,13 @@
     <string name="goal_amount_label">Target amount</string>
     <string name="goal_deadline_label">Deadline (optional)</string>
     <string name="goal_save">Save</string>
-    <string name="validation_goal_title_empty">Title cannot be empty</string>
-    <string name="validation_goal_amount_required">Amount must be greater than 0</string>
     <string name="goals_set_budget">Set monthly budget</string>
     <string name="goals_budget_title">Monthly budget</string>
     <string name="goals_budget_label">Budget amount</string>
     <string name="goals_budget_spent">SPENT OF BUDGET</string>
-    <string name="validation_budget_required">Budget must be greater than 0</string>
     <string name="goals_daily_limit_title">Daily limit</string>
     <string name="goals_daily_limit_set">Set daily limit</string>
     <string name="goals_daily_limit_label">Amount</string>
-    <string name="validation_daily_limit_required">Enter a valid amount</string>
 
     <!-- Date format -->
     <string name="date_format_pattern">dd.MM.yyyy</string>
@@ -133,6 +130,17 @@
     <string name="validation_category_name_too_long">Name cannot exceed %1$d characters</string>
     <string name="validation_category_icon_required">Please select an icon</string>
     <string name="validation_category_name_duplicate">A category with this name already exists</string>
+    <string name="validation_daily_limit_required">Enter a valid amount</string>
+    <string name="validation_goal_required">Please select a goal</string>
+    <string name="validation_budget_required">Budget must be greater than 0</string>
+    <string name="validation_goal_title_empty">Title cannot be empty</string>
+    <string name="validation_goal_amount_required">Amount must be greater than 0</string>
+
+    <string name="goal_overflow_title">Goal almost reached</string>
+    <string name="goal_overflow_message">Only %1$s is left to reach this goal. Transfer just that amount instead?</string>
+    <string name="goal_overflow_confirm">Transfer %1$s</string>
+    <string name="goal_reached_title">Goal already reached</string>
+    <string name="goal_reached_message">This goal is already fully funded. Nothing more can be added.</string>
 
 
     <!-- Error messages -->
@@ -151,9 +159,17 @@
     <string name="error_delete_goal">Failed to delete goal</string>
     <string name="error_load_categories">Failed to load categories</string>
     <string name="error_update_goal">Failed to update goal</string>
+
+
     <string name="daily_limit_exceeded_title">Daily limit exceeded</string>
     <string name="daily_limit_exceeded_message">This expense will exceed your daily spending limit. Save anyway?</string>
     <string name="daily_limit_exceeded_confirm">Save</string>
+    <string name="budget_exceeded_title">Monthly budget exceeded</string>
+    <string name="budget_exceeded_message">This transaction exceeds your monthly budget. Do you want to continue?</string>
+    <string name="budget_exceeded_confirm">Continue</string>
+
+
     <string name="retry">Retry</string>
+    <string name="simulated_error">Simulated Error</string>
 
 </resources>

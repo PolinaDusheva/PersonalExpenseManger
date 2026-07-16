@@ -30,6 +30,15 @@ class CategoriesViewModel(
 
     private val retrySignal = MutableStateFlow(0)
 
+    private val _formErrors = MutableStateFlow(CategoryFormErrors())
+    val formErrors: StateFlow<CategoryFormErrors> = _formErrors.asStateFlow()
+
+    private val _snackbarEvent = MutableSharedFlow<Int>()
+    val snackbarEvent: SharedFlow<Int> = _snackbarEvent.asSharedFlow()
+
+    private val _nameInput = MutableStateFlow("")
+    private var editingCategoryId: String? = null
+
     val uiState: StateFlow<ICategoriesUIState> = retrySignal.flatMapLatest {
         dataService.categories
             .map { categories -> ICategoriesUIState.Success(categories) as ICategoriesUIState }
@@ -40,17 +49,6 @@ class CategoriesViewModel(
         initialValue = ICategoriesUIState.Loading
     )
 
-    fun retry() { retrySignal.value++ }
-
-    private val _formErrors = MutableStateFlow(CategoryFormErrors())
-    val formErrors: StateFlow<CategoryFormErrors> = _formErrors.asStateFlow()
-
-    private val _snackbarEvent = MutableSharedFlow<Int>()
-    val snackbarEvent: SharedFlow<Int> = _snackbarEvent.asSharedFlow()
-
-    private val _nameInput = MutableStateFlow("")
-    private var editingCategoryId: String? = null
-
     init {
         viewModelScope.launch {
             _nameInput
@@ -58,6 +56,8 @@ class CategoriesViewModel(
                 .collect { name -> validateName(name) }
         }
     }
+
+    fun retry() { retrySignal.value++ }
 
     fun startEditing(category: Category?) {
         editingCategoryId = category?.id
@@ -74,43 +74,16 @@ class CategoriesViewModel(
         _nameInput.value = name
     }
 
-    fun onNameFieldTouched() {
-        _formErrors.update { it.copy(nameTouched = true) }
-    }
-
     fun onIconSelected(iconName: String) {
-        _formErrors.update { it.copy(iconErrorResId = null, iconTouched = true) }
+        _formErrors.update { it.copy(iconErrorResId = null) }
     }
 
-    fun onIconTouched() {
-        _formErrors.update { it.copy(iconTouched = true) }
+    fun onSubmitAttempted() {
+        _formErrors.update { it.copy(submitted = true) }
     }
-
-    private fun validateName(name: String) {
-        val error = notEmpty(name, R.string.validation_category_name_empty)
-            ?: maxLength(name, 20, R.string.validation_category_name_too_long)
-        _formErrors.update { it.copy(nameErrorResId = error) }
-    }
-
-    private fun isDuplicateName(name: String): Boolean =
-        dataService.categories.value.any {
-            it.id != editingCategoryId && it.name.equals(name, ignoreCase = true)
-        }
 
     fun addCategory(name: String, iconName: String) {
-        val nameError = notEmpty(name, R.string.validation_category_name_empty)
-            ?: maxLength(name, 20, R.string.validation_category_name_too_long)
-        val iconError = if (iconName.isBlank()) R.string.validation_category_icon_required else null
-
-        if (nameError != null || iconError != null) {
-            _formErrors.value = _formErrors.value.copy(
-                nameErrorResId = nameError,
-                iconErrorResId = iconError,
-                nameTouched = true,
-                iconTouched = true
-            )
-            return
-        }
+        validationErrors(name, iconName)?.let { _formErrors.value = it; return }
 
         if (isDuplicateName(name)) {
             viewModelScope.launch { _snackbarEvent.emit(R.string.validation_category_name_duplicate) }
@@ -121,7 +94,8 @@ class CategoriesViewModel(
             val category = Category(
                 id = UUID.randomUUID().toString(),
                 name = name,
-                iconName = iconName)
+                iconName = iconName
+            )
             try {
                 dataService.addCategory(category)
             } catch (e: CancellationException) {
@@ -133,19 +107,7 @@ class CategoriesViewModel(
     }
 
     fun updateCategory(category: Category) {
-        val nameError = notEmpty(category.name, R.string.validation_category_name_empty)
-            ?: maxLength(category.name, 20, R.string.validation_category_name_too_long)
-        val iconError = if (category.iconName.isBlank()) R.string.validation_category_icon_required else null
-
-        if (nameError != null || iconError != null) {
-            _formErrors.value = _formErrors.value.copy(
-                nameErrorResId = nameError,
-                iconErrorResId = iconError,
-                nameTouched = true,
-                iconTouched = true
-            )
-            return
-        }
+        validationErrors(category.name, category.iconName)?.let { _formErrors.value = it; return }
 
         if (isDuplicateName(category.name)) {
             viewModelScope.launch { _snackbarEvent.emit(R.string.validation_category_name_duplicate) }
@@ -174,4 +136,26 @@ class CategoriesViewModel(
             }
         }
     }
+
+    private fun validateName(name: String) {
+        _formErrors.update { it.copy(nameErrorResId = nameError(name)) }
+    }
+
+    private fun nameError(name: String): Int? =
+        notEmpty(name, R.string.validation_category_name_empty)
+            ?: maxLength(name, 20, R.string.validation_category_name_too_long)
+
+    private fun validationErrors(name: String, iconName: String): CategoryFormErrors? {
+        val nameErr = nameError(name)
+        val iconErr = if (iconName.isBlank()) R.string.validation_category_icon_required
+        else null
+        return if (nameErr != null || iconErr != null)
+            CategoryFormErrors(nameErrorResId = nameErr, iconErrorResId = iconErr, submitted = true)
+        else null
+    }
+
+    private fun isDuplicateName(name: String): Boolean =
+        dataService.categories.value.any {
+            it.id != editingCategoryId && it.name.equals(name, ignoreCase = true)
+        }
 }

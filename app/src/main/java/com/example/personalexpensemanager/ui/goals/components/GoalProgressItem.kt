@@ -31,6 +31,8 @@ import com.example.personalexpensemanager.ui.goals.IGoalsUIState
 import com.example.personalexpensemanager.ui.theme.GradientEnd
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
 import com.example.personalexpensemanager.ui.theme.GradientStart
+import com.example.personalexpensemanager.ui.theme.TextSecondary
+import com.example.personalexpensemanager.ui.theme.ProgressTrackLight
 import java.math.BigDecimal
 import java.text.DecimalFormat
 
@@ -71,7 +73,7 @@ fun GoalProgressItem(
                 Text(
                     text = "${formatAmount(goalProgress.currentAmount)} / ${formatAmount(goalProgress.goal.targetAmount)}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF6B7280)
+                    color = TextSecondary
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -82,7 +84,7 @@ fun GoalProgressItem(
                 .fillMaxWidth()
                 .height(dimensionResource(R.dimen.category_progress_height))
                 .padding(bottom = dimensionResource(R.dimen.padding_small))
-                .background(Color(0xFFE8E0F0), RoundedCornerShape(50))
+                .background(ProgressTrackLight, RoundedCornerShape(50))
         ) {
             Box(
                 modifier = Modifier

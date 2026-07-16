@@ -1,7 +1,9 @@
 package com.example.personalexpensemanager.ui.goals.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,13 +30,17 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.personalexpensemanager.R
 import com.example.personalexpensemanager.ui.theme.GradientGraphics
+import com.example.personalexpensemanager.ui.theme.TextSecondary
+
+private const val ACTION_BUTTON_ASPECT_RATIO = 2.2f
 
 @Composable
 fun GoalActionButton(
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subtitle: String? = null
 ) {
     val shape = RoundedCornerShape(dimensionResource(R.dimen.statistics_card_corner_radius))
     val iconBrush = GradientGraphics.primaryHorizontal
@@ -46,27 +53,41 @@ fun GoalActionButton(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(2.2f)
+                .aspectRatio(ACTION_BUTTON_ASPECT_RATIO)
                 .shadow(elevation = dimensionResource(R.dimen.elevation), shape = shape)
                 .clip(shape)
                 .background(Color.White, shape)
                 .clickable { onClick() }
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = Color.Unspecified,
-                modifier = Modifier
-                    .size(dimensionResource(R.dimen.category_card_icon_size))
-                    .graphicsLayer(alpha = 0.99f)
-                    .drawWithCache {
-                        onDrawWithContent {
-                            drawContent()
-                            drawRect(brush = iconBrush, blendMode = BlendMode.SrcAtop)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(dimensionResource(R.dimen.category_card_icon_size))
+                        .graphicsLayer(alpha = 0.99f)
+                        .drawWithCache {
+                            onDrawWithContent {
+                                drawContent()
+                                drawRect(brush = iconBrush, blendMode = BlendMode.SrcAtop)
+                            }
                         }
-                    }
-            )
+                )
+                if (subtitle != null) {
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextSecondary
+                    )
+                }
+            }
         }
+
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
         Text(
             text = label,

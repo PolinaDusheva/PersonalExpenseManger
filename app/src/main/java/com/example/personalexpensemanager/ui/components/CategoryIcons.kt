@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
-// 20 валидни iconName стойности — 5x4 решетка при избор
 val categoryIconOptions = listOf(
     "food", "transport", "payments", "entertainment", "health",
     "shopping", "education", "travel", "home", "groceries",

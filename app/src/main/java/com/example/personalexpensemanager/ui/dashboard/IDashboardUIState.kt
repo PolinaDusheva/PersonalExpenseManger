@@ -10,7 +10,7 @@ sealed interface IDashboardUIState {
         val transactions: List<Transaction>,
         val totalAmount: BigDecimal,
         val biggestExpense: BigDecimal,
-        val categoriesMap: HashMap<Category, Float>,
+        val categoriesMap: Map<Category, Float>,
         val categoriesById: Map<String, Category>
     ) : IDashboardUIState
     data object Empty : IDashboardUIState

@@ -6,9 +6,6 @@ data class AddExpenseFormErrors(
     val descriptionErrorResId: Int? = null,
     val dateErrorResId: Int? = null,
     val categoryErrorResId: Int? = null,
-    val titleTouched: Boolean = false,
-    val amountTouched: Boolean = false,
-    val descriptionTouched: Boolean = false,
-    val dateTouched: Boolean = false,
-    val categoryTouched: Boolean = false
+    val goalErrorResId: Int? = null,
+    val submitted: Boolean = false
 )

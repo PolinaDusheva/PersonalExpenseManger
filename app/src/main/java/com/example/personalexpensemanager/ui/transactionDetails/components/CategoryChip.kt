@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +36,7 @@ fun CategoryChip(category: Category) {
                 modifier = Modifier.size(dimensionResource(R.dimen.transaction_detail_chip_icon_size))
             )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.transaction_detail_chip_icon_spacing)))
-            Text(category.name, fontWeight = FontWeight.Medium)
+            Text(category.name, style = MaterialTheme.typography.titleMedium)
         }
     }
 }

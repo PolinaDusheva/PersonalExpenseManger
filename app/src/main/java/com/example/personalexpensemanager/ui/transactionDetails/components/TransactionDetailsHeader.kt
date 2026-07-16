@@ -100,8 +100,7 @@ fun TransactionDetailsHeader(
 
                     Text(
                         text = "${transaction.type.signSymbol}${transaction.amount}${transaction.currency.symbol}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge,
                         color = colorResource(transaction.type.amountColorRes)
                     )
 
